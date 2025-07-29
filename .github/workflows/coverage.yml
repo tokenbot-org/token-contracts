@@ -38,6 +38,7 @@ jobs:
           name: tokenbot-coverage
           fail_ci_if_error: false
           verbose: true
+        continue-on-error: true
           
       - name: Generate coverage summary
         run: |
@@ -50,27 +51,33 @@ jobs:
           # Extract coverage percentages from coverage summary
           if [ -f coverage/coverage-summary.json ]; then
             node -e "
-              const coverage = require('./coverage/coverage-summary.json');
-              const total = coverage.total;
-              
-              console.log('## Coverage Summary');
-              console.log('');
-              console.log('| Metric | Coverage |');
-              console.log('|--------|----------|');
-              console.log('| **Lines** | ' + total.lines.pct + '% (' + total.lines.covered + '/' + total.lines.total + ') |');
-              console.log('| **Functions** | ' + total.functions.pct + '% (' + total.functions.covered + '/' + total.functions.total + ') |');
-              console.log('| **Branches** | ' + total.branches.pct + '% (' + total.branches.covered + '/' + total.branches.total + ') |');
-              console.log('| **Statements** | ' + total.statements.pct + '% (' + total.statements.covered + '/' + total.statements.total + ') |');
-              console.log('');
-              
-              if (total.lines.pct < 80) {
-                console.log('⚠️ **Warning**: Line coverage is below 80%');
-              } else if (total.lines.pct >= 95) {
-                console.log('🎉 **Excellent**: High test coverage achieved!');
-              } else {
-                console.log('✅ **Good**: Test coverage is above 80%');
+              try {
+                const coverage = require('./coverage/coverage-summary.json');
+                const total = coverage.total;
+                
+                console.log('## Coverage Summary');
+                console.log('');
+                console.log('| Metric | Coverage |');
+                console.log('|--------|----------|');
+                console.log('| **Lines** | ' + total.lines.pct + '% (' + total.lines.covered + '/' + total.lines.total + ') |');
+                console.log('| **Functions** | ' + total.functions.pct + '% (' + total.functions.covered + '/' + total.functions.total + ') |');
+                console.log('| **Branches** | ' + total.branches.pct + '% (' + total.branches.covered + '/' + total.branches.total + ') |');
+                console.log('| **Statements** | ' + total.statements.pct + '% (' + total.statements.covered + '/' + total.statements.total + ') |');
+                console.log('');
+                
+                if (total.lines.pct < 80) {
+                  console.log('⚠️ **Warning**: Line coverage is below 80%');
+                } else if (total.lines.pct >= 95) {
+                  console.log('🎉 **Excellent**: High test coverage achieved!');
+                } else {
+                  console.log('✅ **Good**: Test coverage is above 80%');
+                }
+              } catch (error) {
+                console.log('❌ Error parsing coverage data:', error.message);
               }
             " >> coverage-summary.md
+          else
+            echo "❌ Coverage summary file not found" >> coverage-summary.md
           fi
           
       - name: Upload coverage artifacts
@@ -128,42 +135,62 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.base_ref }}
+          path: base-branch
           
       - name: Install dependencies (base)
+        working-directory: base-branch
         run: npm ci
         
       - name: Generate base coverage
+        working-directory: base-branch
         run: |
           npm run test:coverage
-          cp coverage/coverage-summary.json base-coverage.json
+          cp coverage/coverage-summary.json ../base-coverage.json
           
       - name: Compare coverage
         run: |
           node -e "
-            const prCoverage = require('./pr-coverage.json');
-            const baseCoverage = require('./base-coverage.json');
-            
-            const prLines = prCoverage.total.lines.pct;
-            const baseLines = baseCoverage.total.lines.pct;
-            const diff = prLines - baseLines;
-            
-            console.log('# 📊 Coverage Comparison');
-            console.log('');
-            console.log('| Branch | Line Coverage | Change |');
-            console.log('|--------|---------------|---------|');
-            console.log('| Base (' + '${{ github.base_ref }}' + ') | ' + baseLines + '% | - |');
-            console.log('| PR (' + '${{ github.head_ref }}' + ') | ' + prLines + '% | ' + (diff >= 0 ? '+' : '') + diff.toFixed(2) + '% |');
-            console.log('');
-            
-            if (diff < -1) {
-              console.log('❌ **Coverage decreased significantly** (' + diff.toFixed(2) + '%)');
-              console.log('Please add tests to maintain coverage levels.');
-            } else if (diff < 0) {
-              console.log('⚠️ **Coverage decreased slightly** (' + diff.toFixed(2) + '%)');
-            } else if (diff > 0) {
-              console.log('✅ **Coverage improved** (+' + diff.toFixed(2) + '%)');
-            } else {
-              console.log('✅ **Coverage maintained**');
+            try {
+              const fs = require('fs');
+              
+              if (!fs.existsSync('./pr-coverage.json') || !fs.existsSync('./base-coverage.json')) {
+                console.log('# 📊 Coverage Comparison');
+                console.log('');
+                console.log('❌ **Error**: Coverage files not found');
+                console.log('PR coverage file exists:', fs.existsSync('./pr-coverage.json'));
+                console.log('Base coverage file exists:', fs.existsSync('./base-coverage.json'));
+                return;
+              }
+              
+              const prCoverage = require('./pr-coverage.json');
+              const baseCoverage = require('./base-coverage.json');
+              
+              const prLines = prCoverage.total.lines.pct;
+              const baseLines = baseCoverage.total.lines.pct;
+              const diff = prLines - baseLines;
+              
+              console.log('# 📊 Coverage Comparison');
+              console.log('');
+              console.log('| Branch | Line Coverage | Change |');
+              console.log('|--------|---------------|---------|');
+              console.log('| Base (' + '${{ github.base_ref }}' + ') | ' + baseLines + '% | - |');
+              console.log('| PR (' + '${{ github.head_ref }}' + ') | ' + prLines + '% | ' + (diff >= 0 ? '+' : '') + diff.toFixed(2) + '% |');
+              console.log('');
+              
+              if (diff < -1) {
+                console.log('❌ **Coverage decreased significantly** (' + diff.toFixed(2) + '%)');
+                console.log('Please add tests to maintain coverage levels.');
+              } else if (diff < 0) {
+                console.log('⚠️ **Coverage decreased slightly** (' + diff.toFixed(2) + '%)');
+              } else if (diff > 0) {
+                console.log('✅ **Coverage improved** (+' + diff.toFixed(2) + '%)');
+              } else {
+                console.log('✅ **Coverage maintained**');
+              }
+            } catch (error) {
+              console.log('# 📊 Coverage Comparison');
+              console.log('');
+              console.log('❌ **Error comparing coverage**:', error.message);
             }
           " > coverage-diff.md
           
@@ -206,11 +233,17 @@ jobs:
           COVERAGE=$(node -e "console.log(require('./coverage/coverage-summary.json').total.lines.pct)")
           COLOR="red"
           
-          if (( $(echo "$COVERAGE >= 80" | bc -l) )); then
-            COLOR="green"
-          elif (( $(echo "$COVERAGE >= 60" | bc -l) )); then
-            COLOR="yellow"
-          fi
+          # Use node for comparison instead of bc
+          COLOR=$(node -e "
+            const coverage = parseFloat('$COVERAGE');
+            if (coverage >= 80) {
+              console.log('green');
+            } else if (coverage >= 60) {
+              console.log('yellow');
+            } else {
+              console.log('red');
+            }
+          ")
           
           curl -s "https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR}" > coverage-badge.svg
           
