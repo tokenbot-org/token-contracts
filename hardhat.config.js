@@ -14,6 +14,20 @@ module.exports = {
     }
   },
   networks: {
+    // Ethereum Goerli Testnet
+    goerli: {
+      url: "https://eth-goerli.g.alchemy.com/v2/demo",
+      chainId: 5,
+      gasPrice: 20000000000, // 20 gwei
+      accounts: [] // Empty - handled by deploy script
+    },
+    // Ethereum Mainnet
+    mainnet: {
+      url: "https://eth-mainnet.g.alchemy.com/v2/demo",
+      chainId: 1,
+      // Gas price auto-detection recommended for mainnet
+      accounts: [] // Empty - handled by deploy script
+    },
     // Base Goerli Testnet
     baseTestnet: {
       url: "https://goerli.base.org",
@@ -38,8 +52,9 @@ module.exports = {
   // Etherscan verification (works with Basescan)
   etherscan: {
     apiKey: {
-      // Add your Basescan API key here for contract verification
-      // Get one at https://basescan.org/myapikey
+      // Add your API keys here for contract verification
+      goerli: "YOUR_ETHERSCAN_API_KEY",
+      mainnet: "YOUR_ETHERSCAN_API_KEY",
       baseTestnet: "YOUR_BASESCAN_API_KEY",
       baseMainnet: "YOUR_BASESCAN_API_KEY"
     },

@@ -97,14 +97,14 @@ async function main() {
   }
   
   // Get contract factory
-  console.log("\n📄 Compiling and preparing TokenBot contract...");
-  const TokenBot = await hre.ethers.getContractFactory("TokenBot", wallet);
+  console.log("\n📄 Compiling and preparing TokenBot L2 contract...");
+  const TokenBotL2 = await hre.ethers.getContractFactory("TokenBotL2", wallet);
   
   // Deploy contract
-  console.log("\n🔨 Deploying TokenBot...");
+  console.log("\n🔨 Deploying TokenBot L2...");
   console.log("   This may take a few moments...\n");
   
-  const tokenBot = await TokenBot.deploy();
+  const tokenBot = await TokenBotL2.deploy();
   await tokenBot.waitForDeployment();
   
   const contractAddress = await tokenBot.getAddress();

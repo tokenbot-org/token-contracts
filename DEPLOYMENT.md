@@ -22,14 +22,17 @@ npm install --save-dev @openzeppelin/contracts
 
 Ensure your project has the following structure:
 ```
-tokenbot/
+tokenbot-base-contracts/
 ├── contracts/
-│   └── TokenBot.sol
+│   ├── TokenBotL1.sol    # Ethereum L1 contract
+│   └── TokenBotL2.sol    # Base L2 contract
 ├── scripts/
-│   └── deploy.js
+│   ├── deploy.js         # L2 deployment
+│   └── deployL1.js       # L1 deployment
 ├── hardhat.config.js
 ├── package.json
-└── DEPLOYMENT.md
+├── DEPLOYMENT.md
+└── BRIDGE_GUIDE.md       # L1-L2 bridging guide
 ```
 
 ### 3. Compile the Contract
@@ -40,17 +43,31 @@ npx hardhat compile
 
 ## Deployment
 
-### Deploy to Base Goerli Testnet
+### Deploy TokenBot L1 (Ethereum)
 
+#### Testnet (Goerli)
 ```bash
-npx hardhat run scripts/deploy.js --network baseTestnet
+npm run deploy:l1:testnet
 ```
 
-### Deploy to Base Mainnet
-
+#### Mainnet
 ```bash
-npx hardhat run scripts/deploy.js --network baseMainnet
+npm run deploy:l1:mainnet
 ```
+
+### Deploy TokenBot L2 (Base) - Alternative Option
+
+#### Base Goerli Testnet
+```bash
+npm run deploy:l2:testnet
+```
+
+#### Base Mainnet
+```bash
+npm run deploy:l2:mainnet
+```
+
+**Note:** For bridging functionality, deploy to L1 first. The Base bridge will automatically handle L2 representation.
 
 ## Important Notes
 

@@ -8,8 +8,8 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
- * @title TokenBot
- * @dev Implementation of the TokenBot ERC-20 Token with advanced features
+ * @title TokenBot L2
+ * @dev Implementation of the TokenBot ERC-20 Token for Base L2 with advanced features
  * 
  * This contract creates a token with the following properties:
  * - Name: TokenBot
@@ -26,7 +26,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * The contract uses OpenZeppelin's implementations for security and standards compliance.
  * This token is designed to be deployed on Base L2 (Ethereum Layer 2).
  */
-contract TokenBot is ERC20, ERC20Burnable, ERC20Pausable, ERC20Permit, Ownable {
+contract TokenBotL2 is ERC20, ERC20Burnable, ERC20Pausable, ERC20Permit, Ownable {
     // Total supply: 1 billion tokens with 18 decimals
     uint256 public constant TOTAL_SUPPLY = 1_000_000_000 * 10**18;
     
