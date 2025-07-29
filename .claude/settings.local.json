@@ -15,7 +15,8 @@
       "Bash(npm install:*)",
       "Bash(npm run format:*)",
       "Bash(npm run lint:*)",
-      "Bash(npm run test:coverage:*)"
+      "Bash(npm run test:coverage:*)",
+      "Bash(git remote set-url:*)"
     ],
     "deny": []
   }

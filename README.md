@@ -1,8 +1,8 @@
 # TokenBot (TBOT) Token Contracts
 
-[![CI](https://github.com/tokenbot-org/tokenbot-base-contracts/workflows/CI/badge.svg)](https://github.com/tokenbot-org/tokenbot-base-contracts/actions/workflows/ci.yml)
-[![Security](https://github.com/tokenbot-org/tokenbot-base-contracts/workflows/Security/badge.svg)](https://github.com/tokenbot-org/tokenbot-base-contracts/actions/workflows/security.yml)
-[![Coverage](https://github.com/tokenbot-org/tokenbot-base-contracts/workflows/Coverage/badge.svg)](https://github.com/tokenbot-org/tokenbot-base-contracts/actions/workflows/coverage.yml)
+[![CI](https://github.com/tokenbot-org/tokenbot-contracts/workflows/CI/badge.svg)](https://github.com/tokenbot-org/tokenbot-contracts/actions/workflows/ci.yml)
+[![Security](https://github.com/tokenbot-org/tokenbot-contracts/workflows/Security/badge.svg)](https://github.com/tokenbot-org/tokenbot-contracts/actions/workflows/security.yml)
+[![Coverage](https://github.com/tokenbot-org/tokenbot-contracts/workflows/Coverage/badge.svg)](https://github.com/tokenbot-org/tokenbot-contracts/actions/workflows/coverage.yml)
 
 This repository contains the official TokenBot (TBOT) token contracts supporting both Ethereum L1 and Base L2 with native bridge integration.
 
