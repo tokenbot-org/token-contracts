@@ -1,0 +1,178 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'testnet'
+        type: choice
+        options:
+          - testnet
+          - mainnet
+
+jobs:
+  validate-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run full test suite
+        run: npm test
+        
+      - name: Generate coverage report
+        run: npm run test:coverage
+        
+      - name: Compile contracts
+        run: npm run compile
+        
+      - name: Validate contract sizes
+        run: npm run size
+
+  deploy-testnet:
+    runs-on: ubuntu-latest
+    needs: validate-release
+    if: github.event.inputs.environment == 'testnet' || github.event_name == 'workflow_dispatch'
+    environment: testnet
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Deploy L1 to Goerli
+        run: |
+          echo "🚀 Deploying TokenBotL1 to Goerli testnet..."
+          echo "This would deploy with: npm run deploy:l1:testnet"
+          echo "Skipping actual deployment (requires private key)"
+        env:
+          NETWORK: goerli
+          
+      - name: Deploy L2 to Base Goerli
+        run: |
+          echo "🚀 Deploying TokenBotL2 to Base Goerli testnet..."
+          echo "This would deploy with: npm run deploy:l2:testnet" 
+          echo "Skipping actual deployment (requires private key)"
+        env:
+          NETWORK: baseTestnet
+
+  deploy-mainnet:
+    runs-on: ubuntu-latest
+    needs: validate-release
+    if: github.event.inputs.environment == 'mainnet' && github.event_name == 'release'
+    environment: mainnet
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Final validation
+        run: |
+          npm test
+          npm run compile
+          
+      - name: Deploy L1 to Ethereum Mainnet
+        run: |
+          echo "🚀 Deploying TokenBotL1 to Ethereum mainnet..."
+          echo "This would deploy with: npm run deploy:l1:mainnet"
+          echo "⚠️  MAINNET DEPLOYMENT REQUIRES MANUAL EXECUTION"
+          echo "⚠️  Run: npm run deploy:l1:mainnet"
+        env:
+          NETWORK: mainnet
+          
+      - name: Create deployment summary
+        run: |
+          echo "## 🎉 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### TokenBot L1 Contract" >> $GITHUB_STEP_SUMMARY
+          echo "- **Network**: Ethereum Mainnet" >> $GITHUB_STEP_SUMMARY
+          echo "- **Chain ID**: 1" >> $GITHUB_STEP_SUMMARY
+          echo "- **Command**: \`npm run deploy:l1:mainnet\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Bridge Setup" >> $GITHUB_STEP_SUMMARY
+          echo "- L2 representation will be auto-created by Base Bridge" >> $GITHUB_STEP_SUMMARY
+          echo "- Users can bridge at: https://bridge.base.org" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Verify contract on Etherscan" >> $GITHUB_STEP_SUMMARY
+          echo "2. Update documentation with contract addresses" >> $GITHUB_STEP_SUMMARY
+          echo "3. Test bridge functionality" >> $GITHUB_STEP_SUMMARY
+          echo "4. Announce deployment" >> $GITHUB_STEP_SUMMARY
+
+  post-deployment-checks:
+    runs-on: ubuntu-latest
+    needs: [deploy-testnet]
+    if: always() && (needs.deploy-testnet.result == 'success' || needs.deploy-mainnet.result == 'success')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Verify deployment
+        run: |
+          echo "🔍 Post-deployment verification checklist:"
+          echo "□ Contract deployed successfully"
+          echo "□ Contract verified on block explorer"
+          echo "□ Owner set correctly"
+          echo "□ Total supply minted to deployer"
+          echo "□ Bridge functionality tested (if L1 deployment)"
+          echo "□ Documentation updated with addresses"
+          
+      - name: Create GitHub issue for manual verification
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🔍 Post-Deployment Verification Required',
+              body: `## Deployment Verification Checklist
+              
+              Please verify the following after deployment:
+              
+              - [ ] Contract deployed successfully
+              - [ ] Contract verified on block explorer  
+              - [ ] Owner address is correct
+              - [ ] Total supply (1B TBOT) minted to deployer
+              - [ ] Token name and symbol are correct
+              - [ ] Bridge functionality tested (L1 deployments)
+              - [ ] Documentation updated with contract addresses
+              - [ ] Community announcement prepared
+              
+              **Deployment Environment**: ${{ github.event.inputs.environment || 'release' }}
+              **Release**: ${{ github.ref }}
+              **Commit**: ${{ github.sha }}
+              `,
+              labels: ['deployment', 'verification']
+            })

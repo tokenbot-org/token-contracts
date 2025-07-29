@@ -21,6 +21,7 @@ npm install --save-dev @openzeppelin/contracts
 ### 2. Project Structure
 
 Ensure your project has the following structure:
+
 ```
 tokenbot-base-contracts/
 ├── contracts/
@@ -46,11 +47,13 @@ npx hardhat compile
 ### Deploy TokenBot L1 (Ethereum)
 
 #### Testnet (Goerli)
+
 ```bash
 npm run deploy:l1:testnet
 ```
 
 #### Mainnet
+
 ```bash
 npm run deploy:l1:mainnet
 ```
@@ -58,11 +61,13 @@ npm run deploy:l1:mainnet
 ### Deploy TokenBot L2 (Base) - Alternative Option
 
 #### Base Goerli Testnet
+
 ```bash
 npm run deploy:l2:testnet
 ```
 
 #### Base Mainnet
+
 ```bash
 npm run deploy:l2:mainnet
 ```
@@ -81,12 +86,14 @@ npm run deploy:l2:mainnet
 ### Network Requirements
 
 #### Base Goerli Testnet
+
 - Chain ID: 84531
 - RPC URL: https://goerli.base.org
 - Explorer: https://goerli.basescan.org
 - Faucet: https://www.coinbase.com/faucets/base-ethereum-goerli-faucet
 
 #### Base Mainnet
+
 - Chain ID: 8453
 - RPC URL: https://mainnet.base.org
 - Explorer: https://basescan.org
@@ -122,6 +129,7 @@ npx hardhat verify --network baseMainnet YOUR_CONTRACT_ADDRESS
 ### 2. Contract Management
 
 After deployment, you can:
+
 - Transfer ownership: `transferOwnership(newOwnerAddress)`
 - Pause transfers: `pause()` (only owner)
 - Unpause transfers: `unpause()` (only owner)
@@ -130,6 +138,7 @@ After deployment, you can:
 ### 3. Add Token to Wallets
 
 To add TokenBot to MetaMask or other wallets:
+
 - Token Address: [Your deployed contract address]
 - Token Symbol: TBOT
 - Decimals: 18
@@ -137,20 +146,24 @@ To add TokenBot to MetaMask or other wallets:
 ## Troubleshooting
 
 ### "Insufficient balance" Error
+
 - Ensure your wallet has ETH on the correct network
 - Check you're deploying to the intended network
 
 ### "Invalid private key format" Error
+
 - Private key should be 64 hex characters
 - Can be with or without '0x' prefix
 - Example: `0x1234567890abcdef...` or `1234567890abcdef...`
 
 ### Transaction Timeout
+
 - Base network may be congested
 - Try increasing gas price in hardhat.config.js
 - Wait and retry
 
 ### Compilation Errors
+
 - Ensure Solidity version 0.8.20 is specified
 - Run `npx hardhat clean` then `npx hardhat compile`
 

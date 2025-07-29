@@ -1,0 +1,221 @@
+name: Coverage
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run coverage daily at 6 AM UTC
+    - cron: '0 6 * * *'
+
+jobs:
+  test-coverage:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Generate coverage report
+        run: npm run test:coverage
+        
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: tokenbot-coverage
+          fail_ci_if_error: false
+          verbose: true
+          
+      - name: Generate coverage summary
+        run: |
+          echo "# 📊 Test Coverage Report" > coverage-summary.md
+          echo "" >> coverage-summary.md
+          echo "**Generated**: $(date)" >> coverage-summary.md
+          echo "**Commit**: ${{ github.sha }}" >> coverage-summary.md
+          echo "" >> coverage-summary.md
+          
+          # Extract coverage percentages from coverage summary
+          if [ -f coverage/coverage-summary.json ]; then
+            node -e "
+              const coverage = require('./coverage/coverage-summary.json');
+              const total = coverage.total;
+              
+              console.log('## Coverage Summary');
+              console.log('');
+              console.log('| Metric | Coverage |');
+              console.log('|--------|----------|');
+              console.log('| **Lines** | ' + total.lines.pct + '% (' + total.lines.covered + '/' + total.lines.total + ') |');
+              console.log('| **Functions** | ' + total.functions.pct + '% (' + total.functions.covered + '/' + total.functions.total + ') |');
+              console.log('| **Branches** | ' + total.branches.pct + '% (' + total.branches.covered + '/' + total.branches.total + ') |');
+              console.log('| **Statements** | ' + total.statements.pct + '% (' + total.statements.covered + '/' + total.statements.total + ') |');
+              console.log('');
+              
+              if (total.lines.pct < 80) {
+                console.log('⚠️ **Warning**: Line coverage is below 80%');
+              } else if (total.lines.pct >= 95) {
+                console.log('🎉 **Excellent**: High test coverage achieved!');
+              } else {
+                console.log('✅ **Good**: Test coverage is above 80%');
+              }
+            " >> coverage-summary.md
+          fi
+          
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            coverage/
+            coverage-summary.md
+            
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            let summary = '';
+            
+            try {
+              summary = fs.readFileSync('coverage-summary.md', 'utf8');
+            } catch (error) {
+              summary = '📊 Coverage report generation failed. Please check the logs.';
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+
+  coverage-diff:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Generate PR coverage
+        run: |
+          npm run test:coverage
+          cp coverage/coverage-summary.json pr-coverage.json
+          
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+          
+      - name: Install dependencies (base)
+        run: npm ci
+        
+      - name: Generate base coverage
+        run: |
+          npm run test:coverage
+          cp coverage/coverage-summary.json base-coverage.json
+          
+      - name: Compare coverage
+        run: |
+          node -e "
+            const prCoverage = require('./pr-coverage.json');
+            const baseCoverage = require('./base-coverage.json');
+            
+            const prLines = prCoverage.total.lines.pct;
+            const baseLines = baseCoverage.total.lines.pct;
+            const diff = prLines - baseLines;
+            
+            console.log('# 📊 Coverage Comparison');
+            console.log('');
+            console.log('| Branch | Line Coverage | Change |');
+            console.log('|--------|---------------|---------|');
+            console.log('| Base (' + '${{ github.base_ref }}' + ') | ' + baseLines + '% | - |');
+            console.log('| PR (' + '${{ github.head_ref }}' + ') | ' + prLines + '% | ' + (diff >= 0 ? '+' : '') + diff.toFixed(2) + '% |');
+            console.log('');
+            
+            if (diff < -1) {
+              console.log('❌ **Coverage decreased significantly** (' + diff.toFixed(2) + '%)');
+              console.log('Please add tests to maintain coverage levels.');
+            } else if (diff < 0) {
+              console.log('⚠️ **Coverage decreased slightly** (' + diff.toFixed(2) + '%)');
+            } else if (diff > 0) {
+              console.log('✅ **Coverage improved** (+' + diff.toFixed(2) + '%)');
+            } else {
+              console.log('✅ **Coverage maintained**');
+            }
+          " > coverage-diff.md
+          
+      - name: Comment coverage diff on PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const diff = fs.readFileSync('coverage-diff.md', 'utf8');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: diff
+            });
+
+  coverage-badge:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Generate coverage
+        run: npm run test:coverage
+        
+      - name: Generate coverage badge
+        run: |
+          COVERAGE=$(node -e "console.log(require('./coverage/coverage-summary.json').total.lines.pct)")
+          COLOR="red"
+          
+          if (( $(echo "$COVERAGE >= 80" | bc -l) )); then
+            COLOR="green"
+          elif (( $(echo "$COVERAGE >= 60" | bc -l) )); then
+            COLOR="yellow"
+          fi
+          
+          curl -s "https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR}" > coverage-badge.svg
+          
+      - name: Upload badge
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-badge
+          path: coverage-badge.svg

@@ -14,40 +14,40 @@ describe("TokenBotL1", function () {
     const [owner, addr1, addr2, addr3] = await ethers.getSigners();
     const TokenBotL1 = await ethers.getContractFactory("TokenBotL1");
     const tokenBotL1 = await TokenBotL1.deploy();
-    
+
     return { tokenBotL1, owner, addr1, addr2, addr3 };
   }
 
   describe("Deployment", function () {
     it("Should set the correct token name and symbol", async function () {
       const { tokenBotL1 } = await loadFixture(deployTokenBotL1Fixture);
-      
+
       expect(await tokenBotL1.name()).to.equal(TOKEN_NAME);
       expect(await tokenBotL1.symbol()).to.equal(TOKEN_SYMBOL);
     });
 
     it("Should mint total supply to deployer", async function () {
       const { tokenBotL1, owner } = await loadFixture(deployTokenBotL1Fixture);
-      
+
       expect(await tokenBotL1.totalSupply()).to.equal(TOTAL_SUPPLY);
       expect(await tokenBotL1.balanceOf(owner.address)).to.equal(TOTAL_SUPPLY);
     });
 
     it("Should set deployer as owner", async function () {
       const { tokenBotL1, owner } = await loadFixture(deployTokenBotL1Fixture);
-      
+
       expect(await tokenBotL1.owner()).to.equal(owner.address);
     });
 
     it("Should have 18 decimals", async function () {
       const { tokenBotL1 } = await loadFixture(deployTokenBotL1Fixture);
-      
+
       expect(await tokenBotL1.decimals()).to.equal(18);
     });
 
     it("Should have correct total supply constant", async function () {
       const { tokenBotL1 } = await loadFixture(deployTokenBotL1Fixture);
-      
+
       expect(await tokenBotL1.TOTAL_SUPPLY()).to.equal(TOTAL_SUPPLY);
     });
   });
@@ -77,9 +77,10 @@ describe("TokenBotL1", function () {
       const { tokenBotL1, owner, addr1 } = await loadFixture(deployTokenBotL1Fixture);
       const initialOwnerBalance = await tokenBotL1.balanceOf(owner.address);
 
-      await expect(
-        tokenBotL1.connect(addr1).transfer(owner.address, 1)
-      ).to.be.revertedWithCustomError(tokenBotL1, "ERC20InsufficientBalance");
+      await expect(tokenBotL1.connect(addr1).transfer(owner.address, 1)).to.be.revertedWithCustomError(
+        tokenBotL1,
+        "ERC20InsufficientBalance"
+      );
 
       expect(await tokenBotL1.balanceOf(owner.address)).to.equal(initialOwnerBalance);
     });
@@ -87,9 +88,10 @@ describe("TokenBotL1", function () {
     it("Should fail when transferring to zero address", async function () {
       const { tokenBotL1, owner } = await loadFixture(deployTokenBotL1Fixture);
 
-      await expect(
-        tokenBotL1.transfer(ZERO_ADDRESS, 100)
-      ).to.be.revertedWithCustomError(tokenBotL1, "ERC20InvalidReceiver");
+      await expect(tokenBotL1.transfer(ZERO_ADDRESS, 100)).to.be.revertedWithCustomError(
+        tokenBotL1,
+        "ERC20InvalidReceiver"
+      );
     });
   });
 
@@ -107,9 +109,7 @@ describe("TokenBotL1", function () {
       expect(await tokenBotL1.allowance(owner.address, addr1.address)).to.equal(amount);
 
       // Transfer from owner to addr2 using addr1
-      await expect(
-        tokenBotL1.connect(addr1).transferFrom(owner.address, addr2.address, amount)
-      )
+      await expect(tokenBotL1.connect(addr1).transferFrom(owner.address, addr2.address, amount))
         .to.emit(tokenBotL1, "Transfer")
         .withArgs(owner.address, addr2.address, amount);
 
@@ -150,7 +150,7 @@ describe("TokenBotL1", function () {
 
       // Transfer tokens to addr1
       await tokenBotL1.transfer(addr1.address, burnAmount * 2n);
-      
+
       // Approve owner to burn addr1's tokens
       await tokenBotL1.connect(addr1).approve(owner.address, burnAmount);
 
@@ -168,9 +168,10 @@ describe("TokenBotL1", function () {
     it("Should fail when burning more than balance", async function () {
       const { tokenBotL1, addr1 } = await loadFixture(deployTokenBotL1Fixture);
 
-      await expect(
-        tokenBotL1.connect(addr1).burn(1)
-      ).to.be.revertedWithCustomError(tokenBotL1, "ERC20InsufficientBalance");
+      await expect(tokenBotL1.connect(addr1).burn(1)).to.be.revertedWithCustomError(
+        tokenBotL1,
+        "ERC20InsufficientBalance"
+      );
     });
   });
 
@@ -179,16 +180,12 @@ describe("TokenBotL1", function () {
       const { tokenBotL1, owner } = await loadFixture(deployTokenBotL1Fixture);
 
       // Pause
-      await expect(tokenBotL1.pause())
-        .to.emit(tokenBotL1, "Paused")
-        .withArgs(owner.address);
+      await expect(tokenBotL1.pause()).to.emit(tokenBotL1, "Paused").withArgs(owner.address);
 
       expect(await tokenBotL1.paused()).to.be.true;
 
       // Unpause
-      await expect(tokenBotL1.unpause())
-        .to.emit(tokenBotL1, "Unpaused")
-        .withArgs(owner.address);
+      await expect(tokenBotL1.unpause()).to.emit(tokenBotL1, "Unpaused").withArgs(owner.address);
 
       expect(await tokenBotL1.paused()).to.be.false;
     });
@@ -198,17 +195,16 @@ describe("TokenBotL1", function () {
 
       await tokenBotL1.pause();
 
-      await expect(
-        tokenBotL1.transfer(addr1.address, 100)
-      ).to.be.revertedWithCustomError(tokenBotL1, "EnforcedPause");
+      await expect(tokenBotL1.transfer(addr1.address, 100)).to.be.revertedWithCustomError(tokenBotL1, "EnforcedPause");
     });
 
     it("Should prevent non-owner from pausing", async function () {
       const { tokenBotL1, addr1 } = await loadFixture(deployTokenBotL1Fixture);
 
-      await expect(
-        tokenBotL1.connect(addr1).pause()
-      ).to.be.revertedWithCustomError(tokenBotL1, "OwnableUnauthorizedAccount");
+      await expect(tokenBotL1.connect(addr1).pause()).to.be.revertedWithCustomError(
+        tokenBotL1,
+        "OwnableUnauthorizedAccount"
+      );
     });
 
     it("Should prevent burning when paused", async function () {
@@ -218,8 +214,7 @@ describe("TokenBotL1", function () {
       await tokenBotL1.pause();
 
       // Burning should also be prevented when paused
-      await expect(tokenBotL1.burn(burnAmount))
-        .to.be.revertedWithCustomError(tokenBotL1, "EnforcedPause");
+      await expect(tokenBotL1.burn(burnAmount)).to.be.revertedWithCustomError(tokenBotL1, "EnforcedPause");
     });
   });
 
@@ -247,9 +242,10 @@ describe("TokenBotL1", function () {
     it("Should prevent non-owner from transferring ownership", async function () {
       const { tokenBotL1, addr1, addr2 } = await loadFixture(deployTokenBotL1Fixture);
 
-      await expect(
-        tokenBotL1.connect(addr1).transferOwnership(addr2.address)
-      ).to.be.revertedWithCustomError(tokenBotL1, "OwnableUnauthorizedAccount");
+      await expect(tokenBotL1.connect(addr1).transferOwnership(addr2.address)).to.be.revertedWithCustomError(
+        tokenBotL1,
+        "OwnableUnauthorizedAccount"
+      );
     });
   });
 
@@ -297,16 +293,14 @@ describe("TokenBotL1", function () {
       const { tokenBotL1 } = await loadFixture(deployTokenBotL1Fixture);
 
       await tokenBotL1.pause();
-      
-      await expect(tokenBotL1.pause())
-        .to.be.revertedWithCustomError(tokenBotL1, "EnforcedPause");
+
+      await expect(tokenBotL1.pause()).to.be.revertedWithCustomError(tokenBotL1, "EnforcedPause");
     });
 
     it("Should prevent unpausing when not paused", async function () {
       const { tokenBotL1 } = await loadFixture(deployTokenBotL1Fixture);
 
-      await expect(tokenBotL1.unpause())
-        .to.be.revertedWithCustomError(tokenBotL1, "ExpectedPause");
+      await expect(tokenBotL1.unpause()).to.be.revertedWithCustomError(tokenBotL1, "ExpectedPause");
     });
   });
 });

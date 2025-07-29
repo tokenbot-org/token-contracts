@@ -1,12 +1,11 @@
 const hre = require("hardhat");
-const readline = require('readline');
-const { Writable } = require('stream');
+const readline = require("readline");
+const { Writable } = require("stream");
 
 // Muted output stream for password input
 const mutableStdout = new Writable({
-  write: function(chunk, encoding, callback) {
-    if (!this.muted)
-      process.stdout.write(chunk, encoding);
+  write: function (chunk, encoding, callback) {
+    if (!this.muted) process.stdout.write(chunk, encoding);
     callback();
   }
 });
@@ -20,24 +19,26 @@ async function askQuestion(query) {
     terminal: true
   });
 
-  return new Promise(resolve => rl.question(query, ans => {
-    rl.close();
-    resolve(ans);
-  }));
+  return new Promise(resolve =>
+    rl.question(query, ans => {
+      rl.close();
+      resolve(ans);
+    })
+  );
 }
 
 async function askForPrivateKey() {
   mutableStdout.muted = false;
-  console.log('\n🔐 Private Key Required for Deployment');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  mutableStdout.write('Enter your private key: ');
+  console.log("\n🔐 Private Key Required for Deployment");
+  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  mutableStdout.write("Enter your private key: ");
   mutableStdout.muted = true;
-  
-  const privateKey = await askQuestion('');
-  
+
+  const privateKey = await askQuestion("");
+
   mutableStdout.muted = false;
-  console.log('\n'); // New line after hidden input
-  
+  console.log("\n"); // New line after hidden input
+
   return privateKey.trim();
 }
 
@@ -51,9 +52,9 @@ async function main() {
 
   // Get private key securely
   const privateKey = await askForPrivateKey();
-  
+
   // Validate private key format
-  const cleanKey = privateKey.replace('0x', '');
+  const cleanKey = privateKey.replace("0x", "");
   if (!/^[0-9a-fA-F]{64}$/.test(cleanKey)) {
     console.error("❌ Invalid private key format. Expected 64 hex characters.");
     process.exit(1);
@@ -125,7 +126,6 @@ async function main() {
       console.log("Goerli Faucet: https://goerlifaucet.com");
       console.log("Base Goerli Faucet: https://www.coinbase.com/faucets/base-ethereum-goerli-faucet");
     }
-
   } catch (error) {
     console.error("\n❌ Deployment failed:", error.message);
     process.exit(1);
@@ -134,7 +134,7 @@ async function main() {
 
 main()
   .then(() => process.exit(0))
-  .catch((error) => {
+  .catch(error => {
     console.error(error);
     process.exit(1);
   });

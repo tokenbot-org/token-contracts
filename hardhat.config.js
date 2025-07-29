@@ -38,7 +38,7 @@ module.exports = {
     },
     // Base Mainnet
     baseMainnet: {
-      url: "https://mainnet.base.org", 
+      url: "https://mainnet.base.org",
       chainId: 8453,
       // Gas price auto-detection recommended for mainnet
       // Private key will be provided at runtime via deploy script
