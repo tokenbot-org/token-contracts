@@ -12,7 +12,7 @@ const mutableStdout = new Writable({
 
 mutableStdout.muted = false;
 
-async function askQuestion(query) {
+async function askQuestion (query) {
   const rl = readline.createInterface({
     input: process.stdin,
     output: mutableStdout,
@@ -27,7 +27,7 @@ async function askQuestion(query) {
   );
 }
 
-async function askForPrivateKey() {
+async function askForPrivateKey () {
   mutableStdout.muted = false;
   console.log("\n🔐 Private Key Required for Deployment");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
@@ -42,7 +42,7 @@ async function askForPrivateKey() {
   return privateKey.trim();
 }
 
-async function main() {
+async function main () {
   console.log("🚀 TokenBot L1 Deployment Script");
   console.log("================================\n");
 

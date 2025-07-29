@@ -16,10 +16,9 @@ module.exports = {
     extendEnvironment: false,
     hre: false
   },
-  parser: "@babel/eslint-parser",
   parserOptions: {
-    ecmaVersion: 2018,
-    requireConfigFile: false
+    ecmaVersion: 2020,
+    sourceType: "module"
   },
   rules: {
     "node/no-unsupported-features/es-syntax": [
@@ -33,6 +32,24 @@ module.exports = {
     "node/no-unpublished-require": "off",
     "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     "prefer-const": "error",
-    "no-var": "error"
-  }
+    "no-var": "error",
+    semi: ["error", "always"],
+    quotes: ["error", "double"],
+    "no-process-exit": "off", // Allow process.exit in deployment scripts
+    "no-unused-expressions": "off" // Allow chai expect expressions
+  },
+  overrides: [
+    {
+      files: ["scripts/*.js"],
+      rules: {
+        "no-process-exit": "off"
+      }
+    },
+    {
+      files: ["test/*.js"],
+      rules: {
+        "no-unused-expressions": "off"
+      }
+    }
+  ]
 };

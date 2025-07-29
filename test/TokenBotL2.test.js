@@ -10,7 +10,7 @@ describe("TokenBotL2", function () {
   const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
   // Deploy fixture
-  async function deployTokenBotL2Fixture() {
+  async function deployTokenBotL2Fixture () {
     const [owner, addr1, addr2, addr3] = await ethers.getSigners();
     const TokenBotL2 = await ethers.getContractFactory("TokenBotL2");
     const tokenBotL2 = await TokenBotL2.deploy();
@@ -80,7 +80,7 @@ describe("TokenBotL2", function () {
     });
 
     it("Should fail when transferring to zero address", async function () {
-      const { tokenBotL2, owner } = await loadFixture(deployTokenBotL2Fixture);
+      const { tokenBotL2 } = await loadFixture(deployTokenBotL2Fixture);
 
       await expect(tokenBotL2.transfer(ZERO_ADDRESS, 100)).to.be.revertedWithCustomError(
         tokenBotL2,
@@ -185,7 +185,7 @@ describe("TokenBotL2", function () {
     });
 
     it("Should prevent transfers when paused", async function () {
-      const { tokenBotL2, owner, addr1 } = await loadFixture(deployTokenBotL2Fixture);
+      const { tokenBotL2, addr1 } = await loadFixture(deployTokenBotL2Fixture);
 
       await tokenBotL2.pause();
 
@@ -263,7 +263,7 @@ describe("TokenBotL2", function () {
         spender: addr1.address,
         value: amount,
         nonce: await tokenBotL2.nonces(owner.address),
-        deadline: deadline
+        deadline
       };
 
       // Sign permit

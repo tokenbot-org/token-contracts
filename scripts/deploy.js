@@ -6,7 +6,7 @@ const { Wallet } = require("ethers");
  * Prompts user for private key input securely
  * @returns {Promise<string>} The private key entered by the user
  */
-function promptPrivateKey() {
+function promptPrivateKey () {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -22,7 +22,7 @@ function promptPrivateKey() {
     });
 
     // Mask the input
-    rl._writeToOutput = function _writeToOutput(stringToWrite) {
+    rl._writeToOutput = function _writeToOutput (stringToWrite) {
       if (rl.stdoutMuted) {
         rl.output.write("*");
       } else {
@@ -36,7 +36,7 @@ function promptPrivateKey() {
 /**
  * Main deployment function
  */
-async function main() {
+async function main () {
   console.log("🚀 TokenBot Deployment Script");
   console.log("============================");
 
@@ -117,19 +117,19 @@ async function main() {
   // Display deployment summary
   console.log("✅ Deployment Successful!");
   console.log("========================");
-  console.log(`\n📋 Contract Details:`);
+  console.log("\n📋 Contract Details:");
   console.log(`   Contract Address: ${contractAddress}`);
   console.log(`   Token Name: ${name}`);
   console.log(`   Token Symbol: ${symbol}`);
   console.log(`   Decimals: ${decimals}`);
   console.log(`   Total Supply: ${hre.ethers.formatUnits(totalSupply, decimals)} ${symbol}`);
   console.log(`   Owner: ${owner}`);
-  console.log(`\n🔗 View on Explorer:`);
+  console.log("\n🔗 View on Explorer:");
   console.log(`   ${currentNetwork.explorer}/address/${contractAddress}`);
 
   // Verify reminder
   if (network === "baseMainnet") {
-    console.log(`\n📝 Don't forget to verify your contract:`);
+    console.log("\n📝 Don't forget to verify your contract:");
     console.log(`   npx hardhat verify --network ${network} ${contractAddress}`);
   }
 

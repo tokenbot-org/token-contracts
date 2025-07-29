@@ -10,7 +10,7 @@ describe("TokenBotL1", function () {
   const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
   // Deploy fixture
-  async function deployTokenBotL1Fixture() {
+  async function deployTokenBotL1Fixture () {
     const [owner, addr1, addr2, addr3] = await ethers.getSigners();
     const TokenBotL1 = await ethers.getContractFactory("TokenBotL1");
     const tokenBotL1 = await TokenBotL1.deploy();
@@ -86,7 +86,7 @@ describe("TokenBotL1", function () {
     });
 
     it("Should fail when transferring to zero address", async function () {
-      const { tokenBotL1, owner } = await loadFixture(deployTokenBotL1Fixture);
+      const { tokenBotL1 } = await loadFixture(deployTokenBotL1Fixture);
 
       await expect(tokenBotL1.transfer(ZERO_ADDRESS, 100)).to.be.revertedWithCustomError(
         tokenBotL1,
@@ -191,7 +191,7 @@ describe("TokenBotL1", function () {
     });
 
     it("Should prevent transfers when paused", async function () {
-      const { tokenBotL1, owner, addr1 } = await loadFixture(deployTokenBotL1Fixture);
+      const { tokenBotL1, addr1 } = await loadFixture(deployTokenBotL1Fixture);
 
       await tokenBotL1.pause();
 
@@ -208,7 +208,7 @@ describe("TokenBotL1", function () {
     });
 
     it("Should prevent burning when paused", async function () {
-      const { tokenBotL1, owner } = await loadFixture(deployTokenBotL1Fixture);
+      const { tokenBotL1 } = await loadFixture(deployTokenBotL1Fixture);
       const burnAmount = ethers.parseEther("100");
 
       await tokenBotL1.pause();
