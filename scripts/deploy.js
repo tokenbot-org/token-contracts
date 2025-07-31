@@ -1,6 +1,7 @@
 const hre = require("hardhat");
 const readline = require("readline");
 const { Wallet } = require("ethers");
+require("dotenv").config();
 
 /**
  * Prompts user for private key input securely
@@ -37,8 +38,8 @@ function promptPrivateKey () {
  * Main deployment function
  */
 async function main () {
-  console.log("🚀 TokenBot Deployment Script");
-  console.log("============================");
+  console.log("🚀 TokenBot L2 Deployment Script");
+  console.log("================================");
 
   // Get network information
   const network = hre.network.name;
@@ -52,9 +53,9 @@ async function main () {
   // Network details for confirmation
   const networkDetails = {
     baseTestnet: {
-      name: "Base Goerli Testnet",
-      chainId: 84531,
-      explorer: "https://goerli.basescan.org"
+      name: "Base Sepolia Testnet",
+      chainId: 84532,
+      explorer: "https://sepolia.basescan.org"
     },
     baseMainnet: {
       name: "Base Mainnet",
@@ -68,20 +69,28 @@ async function main () {
   console.log(`   Chain ID: ${currentNetwork.chainId}`);
   console.log(`   Explorer: ${currentNetwork.explorer}`);
 
-  // Prompt for private key
-  console.log("\n🔐 Private Key Required");
-  console.log("   Please enter your private key to deploy the contract.");
-  console.log("   Make sure you have enough ETH for gas fees on Base.\n");
-
-  const privateKey = await promptPrivateKey();
+  // Get private key from environment or prompt
+  let privateKey = process.env.DEPLOYER_PRIVATE_KEY;
+  
+  if (!privateKey) {
+    console.log("\n🔐 Private Key Required");
+    console.log("   No DEPLOYER_PRIVATE_KEY found in environment.");
+    console.log("   Please enter your private key to deploy the contract.");
+    console.log("   Make sure you have enough ETH for gas fees on Base.\n");
+    
+    privateKey = await promptPrivateKey();
+  } else {
+    console.log("\n🔐 Using private key from environment variable");
+  }
 
   // Validate private key format
-  if (!privateKey.match(/^(0x)?[0-9a-fA-F]{64}$/)) {
+  const cleanKey = privateKey.replace(/^0x/, "");
+  if (!cleanKey.match(/^[0-9a-fA-F]{64}$/)) {
     throw new Error("Invalid private key format. Expected 64 hex characters (with or without 0x prefix)");
   }
 
   // Create wallet from private key
-  const formattedKey = privateKey.startsWith("0x") ? privateKey : `0x${privateKey}`;
+  const formattedKey = cleanKey.startsWith("0x") ? cleanKey : `0x${cleanKey}`;
   const wallet = new Wallet(formattedKey, hre.ethers.provider);
 
   console.log(`\n💼 Deploying from address: ${wallet.address}`);
@@ -127,10 +136,14 @@ async function main () {
   console.log("\n🔗 View on Explorer:");
   console.log(`   ${currentNetwork.explorer}/address/${contractAddress}`);
 
-  // Verify reminder
-  if (network === "baseMainnet") {
-    console.log("\n📝 Don't forget to verify your contract:");
+  // Auto-verification prompt
+  console.log("\n🔍 Contract Verification");
+  if (network === "baseMainnet" || network === "baseTestnet") {
+    console.log("   To verify your contract on Basescan:");
+    console.log(`   npm run verify:l2:${network === "baseMainnet" ? "mainnet" : "testnet"} ${contractAddress} TokenBotL2`);
+    console.log("\n   Or use the manual command:");
     console.log(`   npx hardhat verify --network ${network} ${contractAddress}`);
+    console.log("\n   Make sure to set your BASESCAN_API_KEY environment variable first!");
   }
 
   console.log("\n🎉 Deployment complete!");

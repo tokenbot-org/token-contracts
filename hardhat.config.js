@@ -1,4 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
+require("@nomicfoundation/hardhat-verify");
+require("dotenv").config();
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -14,57 +16,60 @@ module.exports = {
     }
   },
   networks: {
-    // Ethereum Goerli Testnet
-    goerli: {
-      url: "https://eth-goerli.g.alchemy.com/v2/demo",
-      chainId: 5,
-      gasPrice: 20000000000, // 20 gwei
-      accounts: [] // Empty - handled by deploy script
+    // Ethereum Sepolia Testnet
+    sepolia: {
+      url: process.env.ETHEREUM_SEPOLIA_RPC || "https://eth-sepolia.g.alchemy.com/v2/demo",
+      chainId: 11155111,
+      gasPrice: process.env.GAS_PRICE_GWEI ? parseInt(process.env.GAS_PRICE_GWEI) * 1000000000 : 20000000000,
+      accounts: process.env.DEPLOYER_PRIVATE_KEY ? [`0x${process.env.DEPLOYER_PRIVATE_KEY.replace(/^0x/, "")}`] : []
     },
     // Ethereum Mainnet
     mainnet: {
-      url: "https://eth-mainnet.g.alchemy.com/v2/demo",
+      url: process.env.ETHEREUM_MAINNET_RPC || "https://eth-mainnet.g.alchemy.com/v2/demo",
       chainId: 1,
       // Gas price auto-detection recommended for mainnet
-      accounts: [] // Empty - handled by deploy script
+      accounts: process.env.DEPLOYER_PRIVATE_KEY ? [`0x${process.env.DEPLOYER_PRIVATE_KEY.replace(/^0x/, "")}`] : []
     },
-    // Base Goerli Testnet
+    // Base Sepolia Testnet
     baseTestnet: {
-      url: "https://goerli.base.org",
-      chainId: 84531,
-      gasPrice: 1000000000, // 1 gwei
-      // Private key will be provided at runtime via deploy script
-      accounts: [] // Empty - handled by deploy script
+      url: process.env.BASE_SEPOLIA_RPC || "https://sepolia.base.org",
+      chainId: 84532,
+      gasPrice: process.env.GAS_PRICE_GWEI ? parseInt(process.env.GAS_PRICE_GWEI) * 1000000000 : 1000000000,
+      accounts: process.env.DEPLOYER_PRIVATE_KEY ? [`0x${process.env.DEPLOYER_PRIVATE_KEY.replace(/^0x/, "")}`] : []
     },
     // Base Mainnet
     baseMainnet: {
-      url: "https://mainnet.base.org",
+      url: process.env.BASE_MAINNET_RPC || "https://mainnet.base.org",
       chainId: 8453,
       // Gas price auto-detection recommended for mainnet
-      // Private key will be provided at runtime via deploy script
-      accounts: [] // Empty - handled by deploy script
+      accounts: process.env.DEPLOYER_PRIVATE_KEY ? [`0x${process.env.DEPLOYER_PRIVATE_KEY.replace(/^0x/, "")}`] : []
     },
     // Local Hardhat Network (for testing)
     hardhat: {
-      chainId: 31337
+      chainId: 31337,
+      forking: process.env.FORK_ENABLED === "true" ? {
+        url: process.env.ETHEREUM_MAINNET_RPC || "https://eth-mainnet.g.alchemy.com/v2/demo",
+        blockNumber: process.env.FORK_BLOCK_NUMBER ? parseInt(process.env.FORK_BLOCK_NUMBER) : undefined
+      } : undefined
     }
   },
-  // Etherscan verification (works with Basescan)
+  // Contract verification configuration
   etherscan: {
     apiKey: {
-      // Add your API keys here for contract verification
-      goerli: "YOUR_ETHERSCAN_API_KEY",
-      mainnet: "YOUR_ETHERSCAN_API_KEY",
-      baseTestnet: "YOUR_BASESCAN_API_KEY",
-      baseMainnet: "YOUR_BASESCAN_API_KEY"
+      // Etherscan API keys for verification
+      sepolia: process.env.ETHERSCAN_API_KEY || "YOUR_ETHERSCAN_API_KEY",
+      mainnet: process.env.ETHERSCAN_API_KEY || "YOUR_ETHERSCAN_API_KEY",
+      // Basescan API keys for Base network verification
+      baseTestnet: process.env.BASESCAN_API_KEY || "YOUR_BASESCAN_API_KEY", 
+      baseMainnet: process.env.BASESCAN_API_KEY || "YOUR_BASESCAN_API_KEY"
     },
     customChains: [
       {
         network: "baseTestnet",
-        chainId: 84531,
+        chainId: 84532,
         urls: {
-          apiURL: "https://api-goerli.basescan.org/api",
-          browserURL: "https://goerli.basescan.org"
+          apiURL: "https://api-sepolia.basescan.org/api",
+          browserURL: "https://sepolia.basescan.org"
         }
       },
       {

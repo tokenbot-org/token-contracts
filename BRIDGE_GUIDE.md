@@ -25,7 +25,7 @@ Ethereum L1                    Base L2
 
 ### 1. Deploy to Ethereum L1
 
-#### Testnet (Goerli)
+#### Testnet (Sepolia)
 
 ```bash
 npm run deploy:l1:testnet
@@ -109,7 +109,7 @@ After first bridge transaction:
 - L1 Standard Bridge: `0x3154Cf16ccdb4C6d922629664174b904d80F2C35`
 - L2 Standard Bridge: `0x4200000000000000000000000000000000000010`
 
-#### Testnet (Goerli → Base Goerli)
+#### Testnet (Sepolia → Base Sepolia)
 
 - L1 Standard Bridge: `0xfA6D8Ee5BE770F84FC001D098C4bD604Fe01284a`
 - L2 Standard Bridge: `0x4200000000000000000000000000000000000010`

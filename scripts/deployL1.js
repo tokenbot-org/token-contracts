@@ -1,6 +1,7 @@
 const hre = require("hardhat");
 const readline = require("readline");
 const { Writable } = require("stream");
+require("dotenv").config();
 
 // Muted output stream for password input
 const mutableStdout = new Writable({
@@ -50,18 +51,25 @@ async function main () {
   const network = hre.network.name;
   console.log(`📡 Deploying to network: ${network}`);
 
-  // Get private key securely
-  const privateKey = await askForPrivateKey();
+  // Get private key from environment or prompt
+  let privateKey = process.env.DEPLOYER_PRIVATE_KEY;
+  
+  if (!privateKey) {
+    privateKey = await askForPrivateKey();
+  } else {
+    console.log("\n🔐 Using private key from environment variable");
+  }
 
   // Validate private key format
-  const cleanKey = privateKey.replace("0x", "");
+  const cleanKey = privateKey.replace(/^0x/, "");
   if (!/^[0-9a-fA-F]{64}$/.test(cleanKey)) {
     console.error("❌ Invalid private key format. Expected 64 hex characters.");
     process.exit(1);
   }
 
   // Create wallet with private key
-  const wallet = new hre.ethers.Wallet(privateKey, hre.ethers.provider);
+  const formattedKey = cleanKey.startsWith("0x") ? cleanKey : `0x${cleanKey}`;
+  const wallet = new hre.ethers.Wallet(formattedKey, hre.ethers.provider);
   console.log(`📬 Deploying from address: ${wallet.address}`);
 
   // Check balance
@@ -103,7 +111,10 @@ async function main () {
     console.log("\n🎯 Next Steps:");
     console.log("━━━━━━━━━━━━━━━");
     console.log("1. Verify contract on Etherscan:");
+    console.log(`   npm run verify:l1:${network === "mainnet" ? "mainnet" : "testnet"} ${contractAddress} TokenBotL1`);
+    console.log("   Or manually:");
     console.log(`   npx hardhat verify --network ${network} ${contractAddress}`);
+    console.log("   (Make sure to set your ETHERSCAN_API_KEY environment variable!)");
     console.log("\n2. Bridge tokens to Base L2:");
     console.log("   - Visit https://bridge.base.org");
     console.log("   - Connect wallet and select 'Deposit'");
@@ -120,11 +131,11 @@ async function main () {
     console.log("L2 Token Address: Will be created by Base Bridge");
     console.log("Bridge UI: https://bridge.base.org");
 
-    if (network === "goerli") {
+    if (network === "sepolia") {
       console.log("\n🧪 Testnet Resources:");
       console.log("━━━━━━━━━━━━━━━━━━━");
-      console.log("Goerli Faucet: https://goerlifaucet.com");
-      console.log("Base Goerli Faucet: https://www.coinbase.com/faucets/base-ethereum-goerli-faucet");
+      console.log("Sepolia Faucet: https://sepoliafaucet.com");
+      console.log("Base Sepolia Faucet: https://www.coinbase.com/faucets/base-ethereum-sepolia-faucet");
     }
   } catch (error) {
     console.error("\n❌ Deployment failed:", error.message);
