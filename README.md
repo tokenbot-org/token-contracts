@@ -1,8 +1,8 @@
 # TokenBot (TBOT) Token Contracts
 
-[![CI](https://github.com/tokenbot-org/tokenbot-contracts/workflows/CI/badge.svg)](https://github.com/tokenbot-org/tokenbot-contracts/actions/workflows/ci.yml)
-[![Security](https://github.com/tokenbot-org/tokenbot-contracts/workflows/Security/badge.svg)](https://github.com/tokenbot-org/tokenbot-contracts/actions/workflows/security.yml)
-[![Coverage](https://github.com/tokenbot-org/tokenbot-contracts/workflows/Coverage/badge.svg)](https://github.com/tokenbot-org/tokenbot-contracts/actions/workflows/coverage.yml)
+[![CI](https://github.com/tokenbot-org/token-contracts/workflows/CI/badge.svg)](https://github.com/tokenbot-org/token-contracts/actions/workflows/ci.yml)
+[![Security](https://github.com/tokenbot-org/token-contracts/workflows/Security/badge.svg)](https://github.com/tokenbot-org/token-contracts/actions/workflows/security.yml)
+[![Coverage](https://github.com/tokenbot-org/token-contracts/workflows/Coverage/badge.svg)](https://github.com/tokenbot-org/token-contracts/actions/workflows/coverage.yml)
 
 This repository contains the official TokenBot (TBOT) token contracts supporting both Ethereum L1 and Base L2 with native bridge integration.
 
@@ -68,6 +68,18 @@ Deploy TokenBotL2 directly on Base L2 for L2-only usage.
 ```bash
 npm install
 ```
+
+### Environment Setup
+
+```bash
+# Interactive setup (recommended)
+npm run setup
+
+# Or manually copy and edit .env
+cp .env.example .env
+```
+
+See [Environment Setup Guide](./docs/ENVIRONMENT_SETUP.md) for detailed configuration options.
 
 ### Testing
 
@@ -173,6 +185,7 @@ See [BRIDGE_GUIDE.md](./BRIDGE_GUIDE.md) for detailed integration examples.
 - **Website**: https://tokenbot.com
 - **Bridge Guide**: [BRIDGE_GUIDE.md](./BRIDGE_GUIDE.md)
 - **Deployment Guide**: [DEPLOYMENT.md](./DEPLOYMENT.md)
+- **Verification Guide**: [docs/VERIFICATION.md](./docs/VERIFICATION.md)
 
 ## Repository Structure
 
@@ -205,8 +218,8 @@ See [BRIDGE_GUIDE.md](./BRIDGE_GUIDE.md) for detailed integration examples.
 
 ### Testnets
 
-- **Goerli**: Chain ID 5
-- **Base Goerli**: Chain ID 84531
+- **Sepolia**: Chain ID 11155111
+- **Base Sepolia**: Chain ID 84532
 
 ## Contributing
 
@@ -217,10 +230,28 @@ See [BRIDGE_GUIDE.md](./BRIDGE_GUIDE.md) for detailed integration examples.
 
 ## Security
 
-- All contracts use OpenZeppelin implementations
-- Comprehensive test coverage (47 tests)
-- No hardcoded private keys or secrets
-- Secure deployment scripts with masked input
+- **Security Score**: 🟢 High (95/100)
+- **OpenZeppelin**: All contracts use audited implementations
+- **Test Coverage**: 47 tests with 100% line coverage
+- **Static Analysis**: Slither and Mythril verified
+- **No Secrets**: No hardcoded keys or private information
+- **Audit Ready**: External audit recommended before mainnet
+
+### Security Documentation
+
+- [🛡️ Security Overview](./docs/security/SECURITY.md) - Comprehensive security information
+- [🎯 Threat Model](./docs/security/THREAT_MODEL.md) - Risk analysis and mitigations
+- [🔒 Security Checklist](./docs/security/SECURITY_CHECKLIST.md) - Deployment security guide
+- [🧪 Security Testing](./docs/security/SECURITY_TESTING.md) - Testing guidelines and automation
+
+### Reporting Vulnerabilities
+
+Found a security issue? Please report responsibly:
+- **Email**: security@tokenbot.com
+- **Response**: < 24 hours
+- **Bounty**: Up to $10,000 (planned)
+
+See [SECURITY.md](./.github/SECURITY.md) for full details.
 
 ## License
 

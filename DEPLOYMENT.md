@@ -1,12 +1,13 @@
-# TokenBot Deployment Guide
+# 🚀 TokenBot Deployment Guide
 
-This guide explains how to deploy the TokenBot ERC-20 contract to Base network using Hardhat.
+This guide explains how to deploy the TokenBot ERC-20 contract to Ethereum and Base networks using Hardhat.
 
 ## Prerequisites
 
 1. **Node.js** (v16 or higher)
 2. **Git**
-3. **Base ETH** for gas fees (on testnet or mainnet)
+3. **ETH** for gas fees (on testnet or mainnet)
+4. **Environment configured** - Run `npm run setup` or see [Environment Setup Guide](./docs/ENVIRONMENT_SETUP.md)
 
 ## Setup Instructions
 
@@ -23,7 +24,7 @@ npm install --save-dev @openzeppelin/contracts
 Ensure your project has the following structure:
 
 ```
-tokenbot-base-contracts/
+token-contracts/
 ├── contracts/
 │   ├── TokenBotL1.sol    # Ethereum L1 contract
 │   └── TokenBotL2.sol    # Base L2 contract
@@ -46,7 +47,7 @@ npx hardhat compile
 
 ### Deploy TokenBot L1 (Ethereum)
 
-#### Testnet (Goerli)
+#### Testnet (Sepolia)
 
 ```bash
 npm run deploy:l1:testnet
@@ -60,7 +61,7 @@ npm run deploy:l1:mainnet
 
 ### Deploy TokenBot L2 (Base) - Alternative Option
 
-#### Base Goerli Testnet
+#### Base Sepolia Testnet
 
 ```bash
 npm run deploy:l2:testnet
@@ -85,12 +86,12 @@ npm run deploy:l2:mainnet
 
 ### Network Requirements
 
-#### Base Goerli Testnet
+#### Base Sepolia Testnet
 
-- Chain ID: 84531
-- RPC URL: https://goerli.base.org
-- Explorer: https://goerli.basescan.org
-- Faucet: https://www.coinbase.com/faucets/base-ethereum-goerli-faucet
+- Chain ID: 84532
+- RPC URL: https://sepolia.base.org
+- Explorer: https://sepolia.basescan.org
+- Faucet: https://www.coinbase.com/faucets/base-ethereum-sepolia-faucet
 
 #### Base Mainnet
 
@@ -170,7 +171,7 @@ To add TokenBot to MetaMask or other wallets:
 ## Security Best Practices
 
 1. **Use a dedicated deployment wallet** - Don't use your main wallet
-2. **Test on testnet first** - Always deploy to Base Goerli before mainnet
+2. **Test on testnet first** - Always deploy to Base Sepolia before mainnet
 3. **Verify your contract** - Allows public code inspection
 4. **Transfer ownership** - Consider using a multisig wallet for ownership
 5. **Monitor your contract** - Set up alerts for unusual activity
