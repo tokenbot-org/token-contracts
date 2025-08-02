@@ -18,7 +18,9 @@
       "Bash(npm run test:coverage:*)",
       "Bash(git remote set-url:*)",
       "Bash(chmod:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git checkout:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

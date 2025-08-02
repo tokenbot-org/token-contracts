@@ -4,11 +4,11 @@
 [![Security](https://github.com/tokenbot-org/token-contracts/workflows/Security/badge.svg)](https://github.com/tokenbot-org/token-contracts/actions/workflows/security.yml)
 [![Coverage](https://github.com/tokenbot-org/token-contracts/workflows/Coverage/badge.svg)](https://github.com/tokenbot-org/token-contracts/actions/workflows/coverage.yml)
 
-This repository contains the official TokenBot (TBOT) token contracts supporting both Ethereum L1 and Base L2 with native bridge integration.
+This repository contains the official TokenBot (TBOT) multi-chain token contracts supporting Ethereum L1, Base L2, and Solana with native bridge integration.
 
 ## Overview
 
-TokenBot (TBOT) is an ERC-20 token designed for seamless cross-chain operation between Ethereum mainnet and Base L2. The token supports the Base native bridge for secure, decentralized transfers between layers.
+TokenBot (TBOT) is a multi-chain token designed for seamless cross-chain operation between Ethereum mainnet, Base L2, and Solana. The token leverages native bridges and Wormhole for secure, decentralized transfers across all supported networks.
 
 ### Token Details
 
@@ -22,12 +22,19 @@ TokenBot (TBOT) is an ERC-20 token designed for seamless cross-chain operation b
 ## Architecture
 
 ```
-Ethereum L1                    Base L2
-┌─────────────┐               ┌─────────────┐
-│ TokenBotL1  │               │ L2 TBOT     │
-│   (TBOT)    │◄─────────────►│ (Auto-      │
-│             │  Base Bridge   │  created)   │
-└─────────────┘               └─────────────┘
+    Ethereum L1 (Origin)
+           │
+    ┌──────┴──────┐
+    │             │
+Base L2      Solana
+(Auto)      (Created)
+
+Ethereum L1                    Base L2                    Solana
+┌─────────────┐               ┌─────────────┐           ┌─────────────┐
+│ TokenBotL1  │               │ L2 TBOT     │           │ Wrapped     │
+│   (TBOT)    │◄─────────────►│ (Auto-      │◄─────────►│ TBOT (SPL)  │
+│             │  Base Bridge   │  created)   │ Wormhole  │   Token     │
+└─────────────┘               └─────────────┘           └─────────────┘
 ```
 
 ## Contracts
@@ -36,25 +43,15 @@ Ethereum L1                    Base L2
 
 - **Purpose**: Primary token contract on Ethereum L1
 - **Features**: Burnable, Pausable, Ownable
-- **Deployment**: `npm run deploy:l1:mainnet`
+- **Networks**: Ethereum → Base (automatic) → Solana (Wormhole)
 
-### TokenBotL2.sol
+## Multi-Chain Deployment
 
-- **Purpose**: Alternative deployment for Base L2 (if not using bridge)
-- **Features**: Burnable, Pausable, Permit (EIP-2612), Ownable
-- **Deployment**: `npm run deploy:l2:mainnet`
+TBOT launches simultaneously across Ethereum, Base, and Solana:
 
-## Deployment Strategy
-
-### Recommended: L1 First with Native Bridge
-
-1. Deploy TokenBotL1 on Ethereum mainnet
-2. Base bridge automatically creates L2 representation
-3. Users bridge tokens via https://bridge.base.org
-
-### Alternative: Direct L2 Deployment
-
-Deploy TokenBotL2 directly on Base L2 for L2-only usage.
+1. **Ethereum L1**: Origin token deployment
+2. **Base L2**: Automatic creation via Base Bridge
+3. **Solana**: SPL token created and registered with Wormhole
 
 ## Quick Start
 
@@ -121,25 +118,22 @@ npm run format
 
 ### Deployment
 
-#### L1 Deployment (Recommended)
+#### Multi-Chain Deployment
 
 ```bash
-# Testnet
-npm run deploy:l1:testnet
+# Testnet (Sepolia + Base Sepolia + Solana Devnet)
+npm run deploy:multichain:testnet
 
-# Mainnet
-npm run deploy:l1:mainnet
+# Mainnet (Ethereum + Base + Solana)
+npm run deploy:multichain:mainnet
 ```
 
-#### L2 Deployment (Alternative)
-
-```bash
-# Testnet
-npm run deploy:l2:testnet
-
-# Mainnet
-npm run deploy:l2:mainnet
-```
+This will:
+1. Deploy TokenBotL1 to Ethereum
+2. Calculate Base L2 address (created on first bridge)
+3. Create SPL token on Solana
+4. Register with Wormhole bridge
+5. Save all addresses to `deployments/multichain-addresses.json`
 
 ## Bridging
 
