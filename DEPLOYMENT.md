@@ -1,183 +1,226 @@
-# 🚀 TokenBot Deployment Guide
+# 🚀 TokenBot Multi-Chain Deployment Guide
 
-This guide explains how to deploy the TokenBot ERC-20 contract to Ethereum and Base networks using Hardhat.
+This guide explains how to deploy TokenBot (TBOT) simultaneously across Ethereum, Base, and Solana networks.
 
 ## Prerequisites
 
 1. **Node.js** (v16 or higher)
 2. **Git**
-3. **ETH** for gas fees (on testnet or mainnet)
+3. **Wallets & Funds**:
+   - ETH on Ethereum (for deployment + gas)
+   - ETH on Base (for bridge fees)
+   - SOL on Solana (for token creation)
 4. **Environment configured** - Run `npm run setup` or see [Environment Setup Guide](./docs/ENVIRONMENT_SETUP.md)
+
+## Multi-Chain Architecture
+
+```
+    Ethereum L1 (Origin)
+           │
+    ┌──────┴──────┐
+    │             │
+Base L2      Solana
+(Auto)      (Created)
+```
 
 ## Setup Instructions
 
 ### 1. Install Dependencies
 
 ```bash
-npm init -y
-npm install --save-dev hardhat @nomicfoundation/hardhat-toolbox
-npm install --save-dev @openzeppelin/contracts
+npm install
 ```
 
-### 2. Project Structure
+### 2. Configure Environment
 
-Ensure your project has the following structure:
+```bash
+# Interactive setup (recommended)
+npm run setup
 
-```
-token-contracts/
-├── contracts/
-│   ├── TokenBotL1.sol    # Ethereum L1 contract
-│   └── TokenBotL2.sol    # Base L2 contract
-├── scripts/
-│   ├── deploy.js         # L2 deployment
-│   └── deployL1.js       # L1 deployment
-├── hardhat.config.js
-├── package.json
-├── DEPLOYMENT.md
-└── BRIDGE_GUIDE.md       # L1-L2 bridging guide
+# Or manually configure .env
+cp .env.example .env
+# Edit .env with your credentials
 ```
 
-### 3. Compile the Contract
+Required environment variables:
+```env
+# Ethereum/Base
+PRIVATE_KEY="your_ethereum_private_key"
+ETHEREUM_RPC_URL="https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY"
+BASE_RPC_URL="https://base-mainnet.g.alchemy.com/v2/YOUR_KEY"
+
+# Solana
+SOLANA_RPC_URL="https://api.mainnet-beta.solana.com"
+SOLANA_PRIVATE_KEY="[byte_array_format]"
+
+# API Keys (for verification)
+ETHERSCAN_API_KEY="your_etherscan_key"
+BASESCAN_API_KEY="your_basescan_key"
+```
+
+### 3. Compile Contracts
 
 ```bash
 npx hardhat compile
 ```
 
-## Deployment
+## Multi-Chain Deployment
 
-### Deploy TokenBot L1 (Ethereum)
+### Testnet Deployment
 
-#### Testnet (Sepolia)
-
-```bash
-npm run deploy:l1:testnet
-```
-
-#### Mainnet
+Deploy to Sepolia (Ethereum), Base Sepolia, and Solana Devnet:
 
 ```bash
-npm run deploy:l1:mainnet
+npm run deploy:multichain:testnet
 ```
 
-### Deploy TokenBot L2 (Base) - Alternative Option
+### Mainnet Deployment
 
-#### Base Sepolia Testnet
+Deploy to Ethereum, Base, and Solana mainnet:
 
 ```bash
-npm run deploy:l2:testnet
+npm run deploy:multichain:mainnet
 ```
 
-#### Base Mainnet
+### What Happens During Deployment
+
+1. **Ethereum L1 Deployment**
+   - Deploys TokenBotL1.sol
+   - Mints total supply to deployer
+   - Estimated gas: ~0.05 ETH
+
+2. **Base L2 Address Calculation**
+   - Calculates deterministic L2 address
+   - Token created automatically on first bridge
+   - No deployment needed
+
+3. **Solana SPL Token Creation**
+   - Creates SPL token with metadata
+   - Sets up mint authority
+   - Estimated cost: ~0.01 SOL
+
+4. **Wormhole Registration**
+   - Registers Ethereum token with Wormhole
+   - Enables ETH ↔ Solana bridging
+   - Manual step via Portal UI
+
+5. **Address Storage**
+   - Saves all addresses to `deployments/multichain-addresses.json`
+   - Includes deployment timestamp
+
+## Post-Deployment Steps
+
+### 1. Verify Contracts
 
 ```bash
-npm run deploy:l2:mainnet
+# Verify Ethereum contract
+npm run verify:mainnet -- YOUR_L1_ADDRESS
+
+# Base contract auto-verified when created
 ```
 
-**Note:** For bridging functionality, deploy to L1 first. The Base bridge will automatically handle L2 representation.
+### 2. Register with Bridges
 
-## Important Notes
+#### Wormhole (for Solana)
+1. Go to https://portalbridge.com
+2. Click "Register Token"
+3. Enter Ethereum token address
+4. Confirm transaction
 
-### Private Key Security
+### 3. Test Bridges
 
-- **NEVER** hardcode your private key in any file
-- **NEVER** commit your private key to version control
-- The deployment script will prompt you to enter your private key at runtime
-- Your input will be hidden (masked with asterisks) for security
+Always test with small amounts first:
 
-### Network Requirements
+```bash
+# Base Bridge
+https://bridge.base.org
 
-#### Base Sepolia Testnet
+# Wormhole Bridge
+https://portalbridge.com
+```
 
-- Chain ID: 84532
-- RPC URL: https://sepolia.base.org
-- Explorer: https://sepolia.basescan.org
-- Faucet: https://www.coinbase.com/faucets/base-ethereum-sepolia-faucet
+### 4. Update Documentation
 
-#### Base Mainnet
+Update your project README with:
+- Ethereum contract address
+- Base L2 address (predicted)
+- Solana token address
+- Bridge instructions
 
-- Chain ID: 8453
-- RPC URL: https://mainnet.base.org
-- Explorer: https://basescan.org
-- Bridge: https://bridge.base.org
+## Deployment Output
 
-### Gas Requirements
+After successful deployment, you'll have:
 
-- Ensure your wallet has sufficient ETH for deployment
-- Typical deployment cost: ~0.01-0.02 ETH (varies with gas prices)
-- Base has low gas fees compared to Ethereum mainnet
-
-## Post-Deployment
-
-### 1. Verify Contract (Optional but Recommended)
-
-First, add your Basescan API key to `hardhat.config.js`:
-
-```javascript
-etherscan: {
-  apiKey: {
-    baseTestnet: "YOUR_ACTUAL_BASESCAN_API_KEY",
-    baseMainnet: "YOUR_ACTUAL_BASESCAN_API_KEY"
-  }
+```json
+{
+  "ethereum": "0x1234...5678",
+  "base": "0xABCD...EF01",
+  "solana": "7xKXtg...9PQR",
+  "deployedAt": "2024-01-20T10:30:00Z"
 }
 ```
 
-Then verify:
+## Network Details
 
-```bash
-npx hardhat verify --network baseMainnet YOUR_CONTRACT_ADDRESS
-```
+### Ethereum Mainnet
+- Chain ID: 1
+- Explorer: https://etherscan.io
 
-### 2. Contract Management
+### Base Mainnet
+- Chain ID: 8453
+- Explorer: https://basescan.org
+- Bridge: https://bridge.base.org
 
-After deployment, you can:
+### Solana Mainnet
+- Cluster: mainnet-beta
+- Explorer: https://solscan.io
+- Bridge: https://portalbridge.com
 
-- Transfer ownership: `transferOwnership(newOwnerAddress)`
-- Pause transfers: `pause()` (only owner)
-- Unpause transfers: `unpause()` (only owner)
-- Users can burn tokens: `burn(amount)`
+## Cost Estimates
 
-### 3. Add Token to Wallets
+| Network | Action | Estimated Cost |
+|---------|--------|----------------|
+| Ethereum | Deploy L1 | ~0.05 ETH |
+| Base | First bridge (creates token) | ~0.01 ETH |
+| Solana | Create SPL token | ~0.01 SOL |
+| Ethereum | Wormhole registration | ~0.02 ETH |
 
-To add TokenBot to MetaMask or other wallets:
+## Security Checklist
 
-- Token Address: [Your deployed contract address]
-- Token Symbol: TBOT
-- Decimals: 18
+Before mainnet deployment:
+
+- [ ] Test on all testnets
+- [ ] Audit contract code
+- [ ] Verify deployment wallet security
+- [ ] Document all addresses
+- [ ] Test bridge functionality
+- [ ] Set up monitoring
+- [ ] Plan for key management
+- [ ] Prepare incident response plan
 
 ## Troubleshooting
 
-### "Insufficient balance" Error
+### "Insufficient funds"
+- Check balances on all networks
+- Ensure correct network selected
 
-- Ensure your wallet has ETH on the correct network
-- Check you're deploying to the intended network
+### "Solana key format error"
+```bash
+# Convert base58 to byte array
+solana-keygen pubkey ~/.config/solana/id.json
+```
 
-### "Invalid private key format" Error
+### "Bridge registration failed"
+- Wait for Ethereum deployment confirmation
+- Try again after 10-20 blocks
 
-- Private key should be 64 hex characters
-- Can be with or without '0x' prefix
-- Example: `0x1234567890abcdef...` or `1234567890abcdef...`
-
-### Transaction Timeout
-
-- Base network may be congested
-- Try increasing gas price in hardhat.config.js
-- Wait and retry
-
-### Compilation Errors
-
-- Ensure Solidity version 0.8.20 is specified
-- Run `npx hardhat clean` then `npx hardhat compile`
-
-## Security Best Practices
-
-1. **Use a dedicated deployment wallet** - Don't use your main wallet
-2. **Test on testnet first** - Always deploy to Base Sepolia before mainnet
-3. **Verify your contract** - Allows public code inspection
-4. **Transfer ownership** - Consider using a multisig wallet for ownership
-5. **Monitor your contract** - Set up alerts for unusual activity
+### "Base L2 token not found"
+- Token created on first bridge
+- Bridge a small amount to create
 
 ## Support
 
-- Base Documentation: https://docs.base.org
-- Base Discord: https://discord.gg/buildonbase
-- Hardhat Documentation: https://hardhat.org/docs
+- Ethereum: https://ethereum.org/developers
+- Base: https://docs.base.org
+- Solana: https://docs.solana.com
+- Wormhole: https://docs.wormhole.com

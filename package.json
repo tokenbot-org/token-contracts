@@ -1,7 +1,7 @@
 {
   "name": "tokenbot",
   "version": "1.0.0",
-  "description": "TokenBot (TBOT) - ERC-20 token on Base L2",
+  "description": "TokenBot (TBOT) - Multi-chain ERC-20 token on Ethereum, Base, and Solana",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -26,12 +26,8 @@
     "lint:js:fix": "eslint '**/*.js' --fix",
     "format": "prettier --write '**/*.{js,json,md,sol}'",
     "format:check": "prettier --check '**/*.{js,json,md,sol}'",
-    "deploy:l1:testnet": "hardhat run scripts/deployL1.js --network sepolia",
-    "deploy:l1:mainnet": "hardhat run scripts/deployL1.js --network mainnet",
-    "deploy:l2:testnet": "hardhat run scripts/deploy.js --network baseTestnet",
-    "deploy:l2:mainnet": "hardhat run scripts/deploy.js --network baseMainnet",
-    "deploy:testnet": "hardhat run scripts/deploy.js --network baseTestnet",
-    "deploy:mainnet": "hardhat run scripts/deploy.js --network baseMainnet",
+    "deploy:multichain:testnet": "hardhat run scripts/deployMultiChain.js --network sepolia",
+    "deploy:multichain:mainnet": "hardhat run scripts/deployMultiChain.js --network mainnet",
     "verify": "hardhat run scripts/verify.js",
     "verify:batch": "hardhat run scripts/verifyBatch.js",
     "verify:l1:testnet": "hardhat run scripts/verify.js --network sepolia",
@@ -56,6 +52,9 @@
     "erc20",
     "base",
     "ethereum",
+    "solana",
+    "multi-chain",
+    "cross-chain",
     "blockchain",
     "smart-contract"
   ],
@@ -88,7 +87,9 @@
     "typechain": "^8.3.0"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.0.0"
+    "@openzeppelin/contracts": "^5.0.0",
+    "@solana/web3.js": "^1.87.6",
+    "@solana/spl-token": "^0.3.9"
   },
   "engines": {
     "node": ">=16.0.0"
