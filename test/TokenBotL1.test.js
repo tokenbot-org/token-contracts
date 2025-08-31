@@ -10,7 +10,7 @@ describe("TokenBotL1", function () {
   const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
   // Deploy fixture
-  async function deployTokenBotL1Fixture () {
+  async function deployTokenBotL1Fixture() {
     const [owner, addr1, addr2, addr3] = await ethers.getSigners();
     const TokenBotL1 = await ethers.getContractFactory("TokenBotL1");
     const tokenBotL1 = await TokenBotL1.deploy();

@@ -21,6 +21,7 @@ npm run setup
 ```
 
 This will guide you through configuring:
+
 - Private keys for deployment
 - RPC endpoints
 - API keys for verification
@@ -29,11 +30,13 @@ This will guide you through configuring:
 ### Method 2: Manual Configuration
 
 1. Copy the example file:
+
 ```bash
 cp .env.example .env
 ```
 
 2. Edit `.env` with your values:
+
 ```bash
 # Essential - Your deployment private key
 DEPLOYER_PRIVATE_KEY=your_private_key_here_without_0x
@@ -61,40 +64,40 @@ $env:ETHERSCAN_API_KEY="your_etherscan_api_key"
 
 ### Essential Variables
 
-| Variable | Description | Required | Example |
-|----------|-------------|----------|---------|
-| `DEPLOYER_PRIVATE_KEY` | Private key for deployment | Yes* | `abc123...` (64 hex chars) |
-| `ETHERSCAN_API_KEY` | Etherscan API for verification | No | `ABC123...` |
-| `BASESCAN_API_KEY` | Basescan API for verification | No | `XYZ789...` |
+| Variable               | Description                    | Required | Example                    |
+| ---------------------- | ------------------------------ | -------- | -------------------------- |
+| `DEPLOYER_PRIVATE_KEY` | Private key for deployment     | Yes\*    | `abc123...` (64 hex chars) |
+| `ETHERSCAN_API_KEY`    | Etherscan API for verification | No       | `ABC123...`                |
+| `BASESCAN_API_KEY`     | Basescan API for verification  | No       | `XYZ789...`                |
 
-*Required only if not provided interactively during deployment
+\*Required only if not provided interactively during deployment
 
 ### Network Configuration
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `ETHEREUM_MAINNET_RPC` | Ethereum mainnet RPC URL | Alchemy demo |
-| `ETHEREUM_SEPOLIA_RPC` | Ethereum Sepolia RPC URL | Alchemy demo |
-| `BASE_MAINNET_RPC` | Base mainnet RPC URL | https://mainnet.base.org |
-| `BASE_SEPOLIA_RPC` | Base Sepolia RPC URL | https://sepolia.base.org |
+| Variable               | Description              | Default                  |
+| ---------------------- | ------------------------ | ------------------------ |
+| `ETHEREUM_MAINNET_RPC` | Ethereum mainnet RPC URL | Alchemy demo             |
+| `ETHEREUM_SEPOLIA_RPC` | Ethereum Sepolia RPC URL | Alchemy demo             |
+| `BASE_MAINNET_RPC`     | Base mainnet RPC URL     | https://mainnet.base.org |
+| `BASE_SEPOLIA_RPC`     | Base Sepolia RPC URL     | https://sepolia.base.org |
 
 ### Advanced Options
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `GAS_PRICE_GWEI` | Gas price in gwei | Auto |
-| `GAS_LIMIT` | Gas limit for deployment | Auto |
-| `CONFIRMATIONS` | Block confirmations | 2 |
-| `FORK_ENABLED` | Enable mainnet forking | false |
-| `FORK_BLOCK_NUMBER` | Fork at specific block | Latest |
+| Variable            | Description              | Default |
+| ------------------- | ------------------------ | ------- |
+| `GAS_PRICE_GWEI`    | Gas price in gwei        | Auto    |
+| `GAS_LIMIT`         | Gas limit for deployment | Auto    |
+| `CONFIRMATIONS`     | Block confirmations      | 2       |
+| `FORK_ENABLED`      | Enable mainnet forking   | false   |
+| `FORK_BLOCK_NUMBER` | Fork at specific block   | Latest  |
 
 ### Notification Options
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `SLACK_WEBHOOK_URL` | Slack deployment notifications | No |
-| `DISCORD_WEBHOOK_URL` | Discord deployment notifications | No |
-| `NOTIFICATION_EMAIL` | Email for notifications | No |
+| Variable              | Description                      | Required |
+| --------------------- | -------------------------------- | -------- |
+| `SLACK_WEBHOOK_URL`   | Slack deployment notifications   | No       |
+| `DISCORD_WEBHOOK_URL` | Discord deployment notifications | No       |
+| `NOTIFICATION_EMAIL`  | Email for notifications          | No       |
 
 ## 🛠️ Setup Methods
 
@@ -107,6 +110,7 @@ npm run setup
 ```
 
 Features:
+
 - 🔐 Secure password input (hidden)
 - 📝 Guided configuration
 - ✅ Validation of inputs
@@ -116,11 +120,13 @@ Features:
 ### Manual .env File
 
 1. Create `.env` from template:
+
 ```bash
 cp .env.example .env
 ```
 
 2. Edit with your preferred editor:
+
 ```bash
 # Open in VS Code
 code .env
@@ -133,6 +139,7 @@ vim .env
 ```
 
 3. Add your configuration:
+
 ```env
 # Deployment
 DEPLOYER_PRIVATE_KEY=abc123def456...
@@ -155,6 +162,7 @@ For GitHub Actions or other CI/CD:
    - `BASESCAN_API_KEY`
 
 2. Use in workflow:
+
 ```yaml
 - name: Deploy Contract
   env:
@@ -168,6 +176,7 @@ For GitHub Actions or other CI/CD:
 ### Private Key Security
 
 **DO:**
+
 - ✅ Use hardware wallets for mainnet
 - ✅ Use different keys for testnet/mainnet
 - ✅ Store keys in password managers
@@ -175,6 +184,7 @@ For GitHub Actions or other CI/CD:
 - ✅ Rotate keys regularly
 
 **DON'T:**
+
 - ❌ Commit private keys to git
 - ❌ Share private keys
 - ❌ Use production keys for testing
@@ -184,18 +194,21 @@ For GitHub Actions or other CI/CD:
 ### File Security
 
 1. **Verify .gitignore**:
+
 ```bash
 # Check that .env is ignored
 cat .gitignore | grep .env
 ```
 
 2. **Check git status**:
+
 ```bash
 # Ensure .env is not staged
 git status
 ```
 
 3. **Use encrypted storage**:
+
 ```bash
 # Encrypt .env file
 openssl enc -aes-256-cbc -in .env -out .env.enc
@@ -209,6 +222,7 @@ openssl enc -d -aes-256-cbc -in .env.enc -out .env
 For maximum security, use hardware wallets:
 
 1. Set up in `.env`:
+
 ```env
 HARDWARE_WALLET=true
 HD_PATH=m/44'/60'/0'/0/0
@@ -227,6 +241,7 @@ Variables are loaded in this order (highest priority first):
 4. **Defaults**: Hardcoded fallbacks
 
 Example:
+
 ```bash
 # This takes priority over .env file
 DEPLOYER_PRIVATE_KEY=abc123 npm run deploy:l1:mainnet
@@ -237,11 +252,13 @@ DEPLOYER_PRIVATE_KEY=abc123 npm run deploy:l1:mainnet
 ### Common Issues
 
 #### Private Key Not Found
+
 ```
 Error: No DEPLOYER_PRIVATE_KEY found
 ```
 
 **Solutions:**
+
 1. Run `npm run setup` to configure
 2. Check `.env` file exists and has the key
 3. Verify environment variable is set:
@@ -250,21 +267,25 @@ Error: No DEPLOYER_PRIVATE_KEY found
    ```
 
 #### Invalid Private Key Format
+
 ```
 Error: Invalid private key format
 ```
 
 **Solutions:**
+
 1. Remove `0x` prefix if present
 2. Ensure exactly 64 hexadecimal characters
 3. Check for spaces or special characters
 
 #### RPC Connection Failed
+
 ```
 Error: Could not connect to network
 ```
 
 **Solutions:**
+
 1. Check RPC URL is correct
 2. Verify API key if using provider
 3. Test connection:
@@ -273,11 +294,13 @@ Error: Could not connect to network
    ```
 
 #### Verification API Key Missing
+
 ```
 Warning: No API key for verification
 ```
 
 **Solutions:**
+
 1. Get API key from [Etherscan](https://etherscan.io/apis)
 2. Get API key from [Basescan](https://basescan.org/apis)
 3. Add to `.env`:

@@ -20,7 +20,11 @@
       "Bash(chmod:*)",
       "Bash(find:*)",
       "Bash(git checkout:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(npm run test:*)",
+      "Bash(npm ls:*)",
+      "Bash(node:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

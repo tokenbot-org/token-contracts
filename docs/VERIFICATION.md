@@ -15,6 +15,7 @@ This guide explains how to verify TokenBot smart contracts on block explorers.
 ## 🎯 Overview
 
 Contract verification publishes the source code on block explorers, allowing users to:
+
 - Read and verify the contract code
 - Interact with contract functions through the explorer UI
 - Build trust and transparency
@@ -22,12 +23,12 @@ Contract verification publishes the source code on block explorers, allowing use
 
 ### Supported Networks
 
-| Network | Explorer | API Key Required |
-|---------|----------|------------------|
-| Ethereum Mainnet | [Etherscan](https://etherscan.io) | `ETHERSCAN_API_KEY` |
-| Sepolia Testnet | [Sepolia Etherscan](https://sepolia.etherscan.io) | `ETHERSCAN_API_KEY` |
-| Base Mainnet | [Basescan](https://basescan.org) | `BASESCAN_API_KEY` |
-| Base Sepolia | [Base Sepolia Scan](https://sepolia.basescan.org) | `BASESCAN_API_KEY` |
+| Network          | Explorer                                          | API Key Required    |
+| ---------------- | ------------------------------------------------- | ------------------- |
+| Ethereum Mainnet | [Etherscan](https://etherscan.io)                 | `ETHERSCAN_API_KEY` |
+| Sepolia Testnet  | [Sepolia Etherscan](https://sepolia.etherscan.io) | `ETHERSCAN_API_KEY` |
+| Base Mainnet     | [Basescan](https://basescan.org)                  | `BASESCAN_API_KEY`  |
+| Base Sepolia     | [Base Sepolia Scan](https://sepolia.basescan.org) | `BASESCAN_API_KEY`  |
 
 ## 📝 Prerequisites
 
@@ -36,13 +37,15 @@ Contract verification publishes the source code on block explorers, allowing use
 Get your API keys from the respective explorers:
 
 **Etherscan (for Ethereum networks):**
+
 1. Visit [etherscan.io/apis](https://etherscan.io/apis)
 2. Create a free account
 3. Generate an API key
 
 **Basescan (for Base networks):**
+
 1. Visit [basescan.org/apis](https://basescan.org/apis)
-2. Create a free account  
+2. Create a free account
 3. Generate an API key
 
 ### 2. Environment Variables
@@ -73,17 +76,18 @@ Use the npm scripts for easy verification:
 
 ```bash
 # L1 Contract (Ethereum)
-npm run verify:l1:mainnet <contract_address> TokenBotL1
-npm run verify:l1:testnet <contract_address> TokenBotL1
+npm run verify:l1:mainnet -- <contract_address>
+npm run verify:l1:testnet -- <contract_address>
 
 # L2 Contract (Base)
-npm run verify:l2:mainnet <contract_address> TokenBotL2
-npm run verify:l2:testnet <contract_address> TokenBotL2
+npm run verify:l2:mainnet -- <contract_address>
+npm run verify:l2:testnet -- <contract_address>
 ```
 
 **Example:**
+
 ```bash
-npm run verify:l1:mainnet 0x742d35cc6464c9532...8df31fa93 TokenBotL1
+npm run verify:l1:mainnet -- 0x742d35cc6464c9532...8df31fa93
 ```
 
 ### Batch Verification
@@ -118,10 +122,10 @@ npx hardhat verify --network baseMainnet 0x123abc...def456
 
 ```bash
 # Single contract verification
-npx hardhat run scripts/verify.js --network <network> <contract_address> [contract_name]
+npm run verify -- <contract_address>
 
 # Batch verification
-npx hardhat run scripts/verifyBatch.js --network <network>
+npm run verify:batch
 ```
 
 ## 📦 Batch Verification
@@ -137,7 +141,7 @@ const CONTRACTS = {
   },
   baseMainnet: {
     TokenBotL2: "0x123abc...def456" // Your actual L2 address (if deployed)
-  },
+  }
   // ... other networks
 };
 ```
@@ -148,11 +152,12 @@ const CONTRACTS = {
 # Verify all contracts on mainnet
 npm run verify:batch:mainnet
 
-# Verify all contracts on Base mainnet  
+# Verify all contracts on Base mainnet
 npm run verify:batch:base:mainnet
 ```
 
 The script will:
+
 - Verify each configured contract
 - Wait between verifications to avoid rate limiting
 - Provide a summary of results
@@ -163,34 +168,45 @@ The script will:
 ### Common Issues
 
 #### 1. "Already Verified" Error
+
 ```
 Error: Already Verified
 ```
+
 **Solution:** The contract is already verified. This is not an error!
 
 #### 2. API Key Issues
+
 ```
 Error: Invalid API Key
 ```
+
 **Solutions:**
+
 - Check your API key is correct
 - Ensure environment variables are set
 - Verify you're using the right API key for the network
 
 #### 3. Contract Not Found
+
 ```
 Error: Contract source code not verified
 ```
+
 **Solutions:**
+
 - Wait a few minutes after deployment before verifying
 - Ensure the contract address is correct
 - Check you're on the right network
 
 #### 4. Compilation Mismatch
+
 ```
 Error: Fail - Unable to verify
 ```
+
 **Solutions:**
+
 - Ensure the exact same Solidity version was used
 - Check compiler settings match exactly
 - Verify constructor arguments are correct
@@ -198,17 +214,20 @@ Error: Fail - Unable to verify
 ### Debugging Steps
 
 1. **Check Network:**
+
    ```bash
    npx hardhat network
    ```
 
 2. **Verify API Keys:**
+
    ```bash
    echo $ETHERSCAN_API_KEY
    echo $BASESCAN_API_KEY
    ```
 
 3. **Test Connection:**
+
    ```bash
    # Test Etherscan API
    curl "https://api.etherscan.io/api?module=account&action=balance&address=0x742d35cc6464c9532...8df31fa93&tag=latest&apikey=$ETHERSCAN_API_KEY"
@@ -222,6 +241,7 @@ Error: Fail - Unable to verify
 ### Environment Variables Method
 
 **Linux/macOS:**
+
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
 export ETHERSCAN_API_KEY="your_etherscan_api_key"
@@ -232,6 +252,7 @@ source ~/.bashrc
 ```
 
 **Windows (PowerShell):**
+
 ```powershell
 # Set environment variables
 $env:ETHERSCAN_API_KEY="your_etherscan_api_key"
@@ -245,6 +266,7 @@ $env:BASESCAN_API_KEY="your_basescan_api_key"
 ### .env File Method
 
 Create `.env` in project root:
+
 ```bash
 # TokenBot Environment Variables
 ETHERSCAN_API_KEY=your_etherscan_api_key_here
@@ -259,18 +281,21 @@ BASESCAN_API_KEY=your_basescan_api_key_here
 ## 📊 Verification Checklist
 
 ### Before Verification
+
 - [ ] Contract is deployed and confirmed
 - [ ] API keys are set up correctly
 - [ ] Waited at least 1-2 minutes after deployment
 - [ ] Have the exact contract address
 
 ### During Verification
+
 - [ ] Using correct network flag
 - [ ] Contract address is accurate
 - [ ] Constructor arguments match (if any)
 - [ ] Compiler settings are identical
 
 ### After Verification
+
 - [ ] Contract shows "Verified" on block explorer
 - [ ] Source code is readable
 - [ ] Contract functions are accessible
@@ -281,10 +306,12 @@ BASESCAN_API_KEY=your_basescan_api_key_here
 After successful verification, your contracts will be available at:
 
 ### Ethereum Networks
+
 - **Mainnet:** `https://etherscan.io/address/<contract_address>#code`
 - **Sepolia:** `https://sepolia.etherscan.io/address/<contract_address>#code`
 
-### Base Networks  
+### Base Networks
+
 - **Base Mainnet:** `https://basescan.org/address/<contract_address>#code`
 - **Base Sepolia:** `https://sepolia.basescan.org/address/<contract_address>#code`
 
@@ -293,22 +320,25 @@ After successful verification, your contracts will be available at:
 ### Getting Help
 
 **Documentation:**
+
 - [Hardhat Verification Docs](https://hardhat.org/plugins/nomiclabs-hardhat-etherscan)
 - [Etherscan API Docs](https://docs.etherscan.io/)
 - [Basescan API Docs](https://docs.basescan.org/)
 
 **Common Resources:**
+
 - Hardhat Discord: [discord.gg/hardhat](https://discord.gg/hardhat)
 - TokenBot Issues: [GitHub Issues](https://github.com/tokenbot-org/token-contracts/issues)
 
 ### Emergency Contacts
 
 If verification is blocking a critical deployment:
+
 - **Technical Support:** dev@tokenbot.com
 - **Security Issues:** security@tokenbot.com
 
 ---
 
-**Document Version:** 1.0.0  
-**Last Updated:** [Current Date]  
-**Next Review:** [Date + 1 month]
+**Document Version:** 1.1.0  
+**Last Updated:** 2025-08-30  
+**Repository:** [github.com/tokenbot-org/token-contracts](https://github.com/tokenbot-org/token-contracts)

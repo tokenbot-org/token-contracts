@@ -6,19 +6,12 @@ const { ethers } = require("hardhat");
  */
 function calculateL2TokenAddress(l1Token, l2Bridge) {
   // Base uses CREATE2 with specific salt pattern
-  const salt = ethers.solidityPackedKeccak256(
-    ["address", "address"],
-    [l1Token, l2Bridge]
-  );
-  
+  const salt = ethers.solidityPackedKeccak256(["address", "address"], [l1Token, l2Bridge]);
+
   // Simplified bytecode hash for OptimismMintableERC20
   const initCodeHash = "0x" + "a".repeat(64); // Placeholder
-  
-  return ethers.getCreate2Address(
-    l2Bridge,
-    salt,
-    initCodeHash
-  );
+
+  return ethers.getCreate2Address(l2Bridge, salt, initCodeHash);
 }
 
 /**
@@ -79,18 +72,18 @@ async function verifyBridgeCompatibility(token) {
 async function simulateBridgeDeposit(token, bridge, user, amount) {
   // Approve bridge
   await token.connect(user).approve(bridge, amount);
-  
+
   // Get initial balances
   const userBalanceBefore = await token.balanceOf(user.address);
   const bridgeBalanceBefore = await token.balanceOf(bridge);
-  
+
   // Transfer to bridge (simulating lock)
   await token.connect(user).transfer(bridge, amount);
-  
+
   // Verify balances
   const userBalanceAfter = await token.balanceOf(user.address);
   const bridgeBalanceAfter = await token.balanceOf(bridge);
-  
+
   return {
     userBalanceDiff: userBalanceBefore - userBalanceAfter,
     bridgeBalanceDiff: bridgeBalanceAfter - bridgeBalanceBefore,

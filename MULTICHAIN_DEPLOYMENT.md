@@ -1,6 +1,6 @@
-# Multi-Chain Token Deployment Guide
+# 🌐 Multi-Chain Token Deployment Guide
 
-This guide explains how to deploy TBOT across Ethereum, Base, and Solana with bridge support.
+Comprehensive guide for deploying TokenBot (TBOT) across Ethereum, Base, and Solana with native bridge support and Wormhole integration.
 
 ## Overview
 
@@ -15,20 +15,22 @@ Base L2      Solana
 
 ## What Gets Created
 
-| Chain | Token Type | Creation Method | When Created |
-|-------|------------|-----------------|--------------|
-| Ethereum L1 | ERC-20 (Origin) | Deploy script | Immediately |
-| Base L2 | ERC-20 (Bridged) | Base Bridge | First bridge tx |
-| Solana | SPL Token | Manual/Script | Before bridging |
+| Chain       | Token Type       | Creation Method | When Created    |
+| ----------- | ---------------- | --------------- | --------------- |
+| Ethereum L1 | ERC-20 (Origin)  | Deploy script   | Immediately     |
+| Base L2     | ERC-20 (Bridged) | Base Bridge     | First bridge tx |
+| Solana      | SPL Token        | Manual/Script   | Before bridging |
 
 ## Address Determinism
 
 ### Base L2 Address
+
 - **Deterministic**: Yes
 - **Formula**: `CREATE2(bridge, hash(l1Token, l2Bridge), bytecode)`
 - **Can predict**: Before any bridging occurs
 
 ### Solana Address
+
 - **Deterministic**: No
 - **Depends on**: Keypair used for creation
 - **Must create**: Before users can bridge
@@ -36,19 +38,30 @@ Base L2      Solana
 ## Deployment Process
 
 ### 1. Basic Deployment (L1 Only)
+
 ```bash
 npm run deploy:l1:mainnet
 ```
 
-### 2. Multi-Chain Deployment
-```bash
-# Set up environment
-export SOLANA_RPC_URL="https://api.mainnet-beta.solana.com"
-export SOLANA_PRIVATE_KEY="[...]"  # JSON array format
+### 2. Multi-Chain Deployment (Recommended)
 
-# Run multi-chain deployment
-npx hardhat run scripts/deployMultiChain.js --network mainnet
+```bash
+# Interactive setup
+npm run setup
+
+# Deploy to all chains at once
+npm run deploy:mainnet
+
+# Or for testnet
+npm run deploy:testnet
 ```
+
+This automated deployment:
+
+- Deploys TokenBotL1 to Ethereum
+- Calculates Base L2 address
+- Creates SPL token on Solana
+- Saves all addresses to `deployments/multichain-addresses.json`
 
 ### 3. Manual Solana Setup (Alternative)
 
@@ -71,10 +84,12 @@ spl-token mint <TOKEN_ADDRESS> 1000000000
 ## Bridge Registration
 
 ### Base Bridge
+
 - **Automatic**: No registration needed
 - **Token appears**: After first bridge transaction
 
 ### Wormhole (Solana)
+
 1. Go to https://portalbridge.com
 2. Click "Register Token"
 3. Enter Ethereum token address
@@ -84,8 +99,16 @@ spl-token mint <TOKEN_ADDRESS> 1000000000
 ## Post-Deployment Steps
 
 1. **Verify Contracts**
+
    ```bash
-   npm run verify:mainnet -- <L1_ADDRESS>
+   # Verify Ethereum L1
+   npm run verify:l1:mainnet -- <L1_ADDRESS>
+
+   # Verify Base L2 (after first bridge)
+   npm run verify:l2:mainnet -- <L2_ADDRESS>
+
+   # Or batch verify
+   npm run verify:batch:mainnet
    ```
 
 2. **Update Documentation**
@@ -101,6 +124,7 @@ spl-token mint <TOKEN_ADDRESS> 1000000000
 ## Important Addresses
 
 ### Bridge Contracts
+
 ```javascript
 // Base Bridge
 const BASE_L1_BRIDGE = "0x3154Cf16ccdb4C6d922629664174b904d80F2C35";
@@ -127,15 +151,42 @@ const WORMHOLE_TOKEN_BRIDGE = "0x3ee18B2214AFF97000D974cf647E7C347E8fa585";
 
 ## Cost Estimates
 
-- L1 Deployment: ~0.05 ETH
-- Solana Token Creation: ~0.01 SOL
-- Wormhole Registration: ~0.02 ETH + gas
-- First Base Bridge: ~0.01 ETH (creates L2 token)
+| Network   | Action                    | Estimated Cost           | Notes                                         |
+| --------- | ------------------------- | ------------------------ | --------------------------------------------- |
+| Ethereum  | Deploy TokenBotL1         | ~0.05 ETH                | Includes contract deployment + initialization |
+| Solana    | Create SPL Token          | ~0.01 SOL                | Token creation + metadata                     |
+| Ethereum  | Wormhole Registration     | ~0.02 ETH                | Plus gas fees                                 |
+| Base      | First Bridge (creates L2) | ~0.01 ETH                | Automatic token creation                      |
+| **Total** | **All Networks**          | **~0.08 ETH + 0.01 SOL** | At current prices                             |
 
 ## Security Considerations
 
-1. **Deploy from secure wallet**
-2. **Verify all addresses before sharing**
-3. **Test on testnet first**
-4. **Keep deployment keys secure**
-5. **Document all addresses publicly**
+### Pre-Deployment
+
+1. ✅ Run full test suite: `npm test` (78 tests)
+2. ✅ Check coverage: `npm run test:coverage` (100% required)
+3. ✅ Run security analysis: `npm run security:check`
+4. ✅ Test on all testnets first
+5. ✅ Use hardware wallet for deployment
+
+### During Deployment
+
+1. 🔒 Deploy from secure, air-gapped environment
+2. 🔒 Verify contract source code immediately
+3. 🔒 Double-check all addresses before proceeding
+4. 🔒 Monitor transactions for anomalies
+
+### Post-Deployment
+
+1. 📝 Document all addresses publicly
+2. 📝 Update project documentation
+3. 📝 Set up monitoring and alerts
+4. 📝 Test bridge functionality with small amounts
+5. 📝 Prepare incident response plan
+
+### Key Management
+
+- Never share private keys
+- Use multisig for owner functions
+- Rotate keys after deployment
+- Store backups securely

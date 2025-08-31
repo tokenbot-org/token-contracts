@@ -25,9 +25,11 @@ Base L2      Solana
 
 ## Setup Instructions
 
-### 1. Install Dependencies
+### 1. Clone Repository & Install Dependencies
 
 ```bash
+git clone https://github.com/tokenbot-org/token-contracts.git
+cd token-contracts
 npm install
 ```
 
@@ -43,6 +45,7 @@ cp .env.example .env
 ```
 
 Required environment variables:
+
 ```env
 # Ethereum/Base
 PRIVATE_KEY="your_ethereum_private_key"
@@ -58,10 +61,17 @@ ETHERSCAN_API_KEY="your_etherscan_key"
 BASESCAN_API_KEY="your_basescan_key"
 ```
 
-### 3. Compile Contracts
+### 3. Compile & Test Contracts
 
 ```bash
+# Compile contracts
 npx hardhat compile
+
+# Run tests (78 tests with 100% coverage)
+npm test
+
+# Check coverage
+npm run test:coverage
 ```
 
 ## Multi-Chain Deployment
@@ -71,7 +81,7 @@ npx hardhat compile
 Deploy to Sepolia (Ethereum), Base Sepolia, and Solana Devnet:
 
 ```bash
-npm run deploy:multichain:testnet
+npm run deploy:testnet
 ```
 
 ### Mainnet Deployment
@@ -79,7 +89,7 @@ npm run deploy:multichain:testnet
 Deploy to Ethereum, Base, and Solana mainnet:
 
 ```bash
-npm run deploy:multichain:mainnet
+npm run deploy:mainnet
 ```
 
 ### What Happens During Deployment
@@ -114,14 +124,19 @@ npm run deploy:multichain:mainnet
 
 ```bash
 # Verify Ethereum contract
-npm run verify:mainnet -- YOUR_L1_ADDRESS
+npm run verify:l1:mainnet -- YOUR_L1_ADDRESS
 
-# Base contract auto-verified when created
+# Verify Base contract (after first bridge creates it)
+npm run verify:l2:mainnet -- YOUR_L2_ADDRESS
+
+# Batch verification
+npm run verify:batch:mainnet
 ```
 
 ### 2. Register with Bridges
 
 #### Wormhole (for Solana)
+
 1. Go to https://portalbridge.com
 2. Click "Register Token"
 3. Enter Ethereum token address
@@ -141,11 +156,17 @@ https://portalbridge.com
 
 ### 4. Update Documentation
 
-Update your project README with:
-- Ethereum contract address
-- Base L2 address (predicted)
-- Solana token address
-- Bridge instructions
+The deployment script automatically saves addresses to:
+
+- `deployments/multichain-addresses.json` - All deployed addresses
+- `deployments/ethereum-mainnet.json` - Ethereum deployment details
+- `deployments/base-mainnet.json` - Base deployment details
+
+Update your project documentation with:
+
+- Contract addresses from deployment files
+- Bridge instructions for users
+- Network-specific information
 
 ## Deployment Output
 
@@ -163,27 +184,30 @@ After successful deployment, you'll have:
 ## Network Details
 
 ### Ethereum Mainnet
+
 - Chain ID: 1
 - Explorer: https://etherscan.io
 
 ### Base Mainnet
+
 - Chain ID: 8453
 - Explorer: https://basescan.org
 - Bridge: https://bridge.base.org
 
 ### Solana Mainnet
+
 - Cluster: mainnet-beta
 - Explorer: https://solscan.io
 - Bridge: https://portalbridge.com
 
 ## Cost Estimates
 
-| Network | Action | Estimated Cost |
-|---------|--------|----------------|
-| Ethereum | Deploy L1 | ~0.05 ETH |
-| Base | First bridge (creates token) | ~0.01 ETH |
-| Solana | Create SPL token | ~0.01 SOL |
-| Ethereum | Wormhole registration | ~0.02 ETH |
+| Network  | Action                       | Estimated Cost |
+| -------- | ---------------------------- | -------------- |
+| Ethereum | Deploy L1                    | ~0.05 ETH      |
+| Base     | First bridge (creates token) | ~0.01 ETH      |
+| Solana   | Create SPL token             | ~0.01 SOL      |
+| Ethereum | Wormhole registration        | ~0.02 ETH      |
 
 ## Security Checklist
 
@@ -201,20 +225,24 @@ Before mainnet deployment:
 ## Troubleshooting
 
 ### "Insufficient funds"
+
 - Check balances on all networks
 - Ensure correct network selected
 
 ### "Solana key format error"
+
 ```bash
 # Convert base58 to byte array
 solana-keygen pubkey ~/.config/solana/id.json
 ```
 
 ### "Bridge registration failed"
+
 - Wait for Ethereum deployment confirmation
 - Try again after 10-20 blocks
 
 ### "Base L2 token not found"
+
 - Token created on first bridge
 - Bridge a small amount to create
 
