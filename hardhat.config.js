@@ -47,10 +47,13 @@ module.exports = {
     // Local Hardhat Network (for testing)
     hardhat: {
       chainId: 31337,
-      forking: process.env.FORK_ENABLED === "true" ? {
-        url: process.env.ETHEREUM_MAINNET_RPC || "https://eth-mainnet.g.alchemy.com/v2/demo",
-        blockNumber: process.env.FORK_BLOCK_NUMBER ? parseInt(process.env.FORK_BLOCK_NUMBER) : undefined
-      } : undefined
+      forking:
+        process.env.FORK_ENABLED === "true"
+          ? {
+              url: process.env.ETHEREUM_MAINNET_RPC || "https://eth-mainnet.g.alchemy.com/v2/demo",
+              blockNumber: process.env.FORK_BLOCK_NUMBER ? parseInt(process.env.FORK_BLOCK_NUMBER) : undefined
+            }
+          : undefined
     }
   },
   // Contract verification configuration
@@ -60,7 +63,7 @@ module.exports = {
       sepolia: process.env.ETHERSCAN_API_KEY || "YOUR_ETHERSCAN_API_KEY",
       mainnet: process.env.ETHERSCAN_API_KEY || "YOUR_ETHERSCAN_API_KEY",
       // Basescan API keys for Base network verification
-      baseTestnet: process.env.BASESCAN_API_KEY || "YOUR_BASESCAN_API_KEY", 
+      baseTestnet: process.env.BASESCAN_API_KEY || "YOUR_BASESCAN_API_KEY",
       baseMainnet: process.env.BASESCAN_API_KEY || "YOUR_BASESCAN_API_KEY"
     },
     customChains: [

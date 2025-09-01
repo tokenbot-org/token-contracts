@@ -1,40 +1,69 @@
-# TokenBot L1-L2 Bridge Guide
+# 🌉 TokenBot Cross-Chain Bridge Guide
 
-This guide explains how to deploy and use TokenBot (TBOT) across Ethereum L1 and Base L2 using the native Base Bridge.
+Comprehensive guide for bridging TokenBot (TBOT) between Ethereum L1, Base L2, and Solana using native bridges and Wormhole.
 
 ## Overview
 
-The native Base Bridge approach allows seamless token transfers between Ethereum mainnet (L1) and Base (L2):
+TokenBot supports multiple bridge solutions for cross-chain transfers:
 
-- Deploy TBOT on Ethereum L1 first
-- Base Bridge automatically creates the L2 representation
-- Users can bridge tokens in both directions
+### Base Bridge (Ethereum ↔ Base)
+
+- Native, secure bridge solution
+- Automatic L2 token creation
+- No additional deployment needed
+
+### Wormhole (Ethereum ↔ Solana)
+
+- Cross-chain messaging protocol
+- Supports SPL token wrapping
+- Requires token registration
 
 ## Architecture
 
 ```
-Ethereum L1                    Base L2
-┌─────────────┐               ┌─────────────┐
-│ TokenBotL1  │               │ L2 TBOT     │
-│   (TBOT)    │◄─────────────►│ (Auto-      │
-│             │  Base Bridge   │  created)   │
-└─────────────┘               └─────────────┘
+       Ethereum L1 (Origin)
+              │
+       ┌──────┴──────┐
+       │             │
+   Base L2       Solana
+ (Base Bridge)  (Wormhole)
+       │             │
+Auto-created    SPL Token
+```
+
+### Bridge Flow Diagram
+
+```
+Ethereum L1                    Base L2                    Solana
+┌─────────────┐               ┌─────────────┐           ┌─────────────┐
+│ TokenBotL1  │               │ L2 TBOT     │           │ Wrapped     │
+│   (TBOT)    │◄─────────────►│ (Auto-      │◄─────────►│ TBOT (SPL)  │
+│             │  Base Bridge   │  created)   │ Wormhole  │   Token     │
+└─────────────┘               └─────────────┘           └─────────────┘
 ```
 
 ## Deployment Steps
 
-### 1. Deploy to Ethereum L1
-
-#### Testnet (Sepolia)
+### Option 1: Multi-Chain Deployment (Recommended)
 
 ```bash
-npm run deploy:l1:testnet
+# Deploy to all chains at once
+npm run deploy:mainnet
+
+# Or for testnet
+npm run deploy:testnet
 ```
 
-#### Mainnet
+### Option 2: Individual Deployment
+
+#### Deploy to Ethereum L1
 
 ```bash
+# Mainnet
 npm run deploy:l1:mainnet
+
+# Testnet (Sepolia)
+npm run deploy:l1:testnet
 ```
 
 ### 2. Bridge Setup
@@ -62,8 +91,12 @@ No additional deployment needed on L2!
 
 ### Bridge Timing
 
-- **L1 → L2 (Deposit)**: ~1-3 minutes
-- **L2 → L1 (Withdraw)**: ~7 days (challenge period)
+| Route             | Direction    | Time         | Notes                     |
+| ----------------- | ------------ | ------------ | ------------------------- |
+| Ethereum → Base   | Deposit      | ~1-3 minutes | Fast, automatic           |
+| Base → Ethereum   | Withdraw     | ~7 days      | Security challenge period |
+| Ethereum → Solana | Via Wormhole | ~15 minutes  | Requires confirmations    |
+| Solana → Ethereum | Via Wormhole | ~15 minutes  | Requires confirmations    |
 
 ### Programmatic Bridging
 
@@ -138,9 +171,57 @@ After first bridge transaction:
 - Check Etherscan/Basescan for status
 - May need to wait for network confirmation
 
+## Solana Bridge (via Wormhole)
+
+### Setup
+
+1. **Register Token with Wormhole**
+   - Visit https://portalbridge.com
+   - Click "Register Token"
+   - Enter Ethereum TBOT address
+   - Confirm transaction
+
+2. **Bridge Tokens**
+   - Select source chain (Ethereum/Base)
+   - Select destination (Solana)
+   - Enter amount
+   - Approve and confirm
+
+### Solana Bridge Considerations
+
+- **Decimals**: Ethereum uses 18, Solana uses 9
+- **Fees**: Small Wormhole fee + gas
+- **Time**: ~15 minutes for finality
+- **Wrapping**: Creates wrapped SPL token
+
+## Bridge Comparison
+
+| Feature          | Base Bridge       | Wormhole            |
+| ---------------- | ----------------- | ------------------- |
+| Networks         | ETH ↔ Base       | ETH ↔ Solana       |
+| Speed (Deposit)  | 1-3 min           | ~15 min             |
+| Speed (Withdraw) | 7 days            | ~15 min             |
+| Fees             | Gas only          | Gas + bridge fee    |
+| Token Creation   | Automatic         | Manual registration |
+| Security Model   | Optimistic rollup | Guardian network    |
+
 ## Resources
 
-- Base Bridge: https://bridge.base.org
-- Base Docs: https://docs.base.org/guides/bridge-tokens
-- Bridge Status: https://status.base.org
+### Base Bridge
+
+- Bridge UI: https://bridge.base.org
+- Documentation: https://docs.base.org/guides/bridge-tokens
+- Status: https://status.base.org
 - Support: https://help.coinbase.com/en/base
+
+### Wormhole Bridge
+
+- Portal Bridge: https://portalbridge.com
+- Documentation: https://docs.wormhole.com
+- Explorer: https://wormholescan.io
+- Support: https://discord.gg/wormhole
+
+### Contract Addresses
+
+- See [MULTICHAIN_DEPLOYMENT.md](./MULTICHAIN_DEPLOYMENT.md) for all addresses
+- Check `deployments/` folder for latest deployments
