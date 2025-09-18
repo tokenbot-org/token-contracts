@@ -1,0 +1,14 @@
+{
+  "network": "solana-devnet",
+  "mintAddress": "DHUiyLeGqGxz3f5y5NVUiDMH7FGNko3wYr5eRrwr3TX9",
+  "decimals": 9,
+  "totalSupply": "1000000000",
+  "deployer": "8TuB4ygnd58B9XL99SSdTwr9DjKSthcASKRgJe3S33to",
+  "associatedTokenAccount": "4mnCYF52P688oWGLofshcUg4MH5jvjxJwoiSKJZem4Sz",
+  "deployedAt": "2025-08-30T20:30:34.923Z",
+  "transactions": {
+    "createMint": "4FMkhY9L9XBc8VPZ77JC4rFyUayyRao585AnKS57nyMXbaDwC3tDDHSc69eAwWGZkgbGRAx3haSEvSMTqXWjNRcq",
+    "createATA": "2bNXwRfkm88NfPxt3S4YukHckd7qxoEXzgSAky9aM41rLpJ9QM5282dtwmPGxP7H66PFHzaEUzG5gTAND49JbCwR",
+    "mintTokens": "NMdgommgvu1WKwjtnWUMaX3TTPRqQAeK2RwhqSLTMBdd6T1CU6MyRtD1NRkEDKATkxMdGSc2FjB5NC7NCDqzFQq"
+  }
+}

@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
@@ -65,7 +63,7 @@ async function setupEnvironment() {
     const overwrite = await askQuestion(
       `${colors.yellow}⚠️  .env file already exists. Do you want to overwrite it? (y/N): ${colors.reset}`
     );
-    
+
     if (overwrite.toLowerCase() !== "y") {
       console.log(`${colors.cyan}ℹ️  Keeping existing .env file${colors.reset}`);
       return;
@@ -85,7 +83,7 @@ async function setupEnvironment() {
     `${colors.yellow}Enter your deployer private key (without 0x prefix): ${colors.reset}`,
     true
   );
-  
+
   if (privateKey) {
     envConfig.DEPLOYER_PRIVATE_KEY = privateKey.replace(/^0x/, "");
   }
@@ -129,28 +127,60 @@ async function setupEnvironment() {
   );
   if (etherscanKey) envConfig.ETHERSCAN_API_KEY = etherscanKey;
 
-  const basescanKey = await askQuestion(
-    `${colors.cyan}Basescan API key (for contract verification): ${colors.reset}`
-  );
+  const basescanKey = await askQuestion(`${colors.cyan}Basescan API key (for contract verification): ${colors.reset}`);
   if (basescanKey) envConfig.BASESCAN_API_KEY = basescanKey;
 
-  // Advanced options
-  const advancedSetup = await askQuestion(
-    `\n${colors.cyan}Configure advanced options? (y/N): ${colors.reset}`
+  // Solana Configuration
+  const configureSolana = await askQuestion(
+    `\n${colors.cyan}Configure Solana deployment? (y/N): ${colors.reset}`
   );
+
+  if (configureSolana.toLowerCase() === "y") {
+    console.log(`\n${colors.bright}${colors.magenta}🌊 Solana Configuration${colors.reset}`);
+    console.log("------------------------\n");
+
+    const solanaRpc = await askQuestion(
+      `${colors.cyan}Solana RPC URL (default: https://api.devnet.solana.com): ${colors.reset}`
+    );
+    if (solanaRpc) envConfig.SOLANA_RPC_URL = solanaRpc;
+
+    const keyType = await askQuestion(
+      `${colors.cyan}Which key format will you use? (1: Mnemonic, 2: Private Key): ${colors.reset}`
+    );
+
+    if (keyType === "1") {
+      const solanaMnemonic = await askQuestion(
+        `${colors.yellow}Enter your Solana BIP39 mnemonic (12 or 24 words): ${colors.reset}`,
+        true
+      );
+      if (solanaMnemonic) {
+        envConfig.SOLANA_MNEMONIC = solanaMnemonic;
+        
+        const accountIndex = await askQuestion(
+          `${colors.cyan}Account index for HD derivation (default: 0): ${colors.reset}`
+        );
+        if (accountIndex) envConfig.SOLANA_ACCOUNT_INDEX = accountIndex;
+      }
+    } else if (keyType === "2") {
+      const solanaPrivateKey = await askQuestion(
+        `${colors.yellow}Enter your Solana private key (base58 format): ${colors.reset}`,
+        true
+      );
+      if (solanaPrivateKey) envConfig.SOLANA_PRIVATE_KEY = solanaPrivateKey;
+    }
+  }
+
+  // Advanced options
+  const advancedSetup = await askQuestion(`\n${colors.cyan}Configure advanced options? (y/N): ${colors.reset}`);
 
   if (advancedSetup.toLowerCase() === "y") {
     console.log(`\n${colors.bright}${colors.magenta}⚙️  Advanced Options${colors.reset}`);
     console.log("-------------------\n");
 
-    const gasPrice = await askQuestion(
-      `${colors.cyan}Gas price in gwei (leave empty for auto): ${colors.reset}`
-    );
+    const gasPrice = await askQuestion(`${colors.cyan}Gas price in gwei (leave empty for auto): ${colors.reset}`);
     if (gasPrice) envConfig.GAS_PRICE_GWEI = gasPrice;
 
-    const confirmations = await askQuestion(
-      `${colors.cyan}Deployment confirmations (default: 2): ${colors.reset}`
-    );
+    const confirmations = await askQuestion(`${colors.cyan}Deployment confirmations (default: 2): ${colors.reset}`);
     if (confirmations) envConfig.CONFIRMATIONS = confirmations;
 
     const slackWebhook = await askQuestion(

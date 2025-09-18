@@ -44,8 +44,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Deployment artifacts
-deployments/localhost/
-deployments/hardhat/
+deployments/
 
 # Temporary files
 *.tmp

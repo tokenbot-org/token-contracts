@@ -5,13 +5,15 @@ This document analyzes potential security threats to the TokenBot ecosystem and 
 ## 📊 Threat Model Overview
 
 ### Assets at Risk
+
 1. **Token Supply**: 1 billion TBOT tokens
-2. **User Funds**: Individual token holder balances  
+2. **User Funds**: Individual token holder balances
 3. **Bridge Funds**: Tokens locked in bridge contracts
 4. **Contract Control**: Administrative privileges
 5. **Reputation**: Project and ecosystem trust
 
 ### Threat Actors
+
 - **Malicious Users**: Individual attackers seeking profit
 - **Advanced Persistent Threats**: Sophisticated attack groups
 - **Insider Threats**: Compromised team members or infrastructure
@@ -23,11 +25,13 @@ This document analyzes potential security threats to the TokenBot ecosystem and 
 ### 1. Smart Contract Vulnerabilities
 
 #### T1.1: Reentrancy Attacks
+
 **Likelihood**: 🟢 Low  
 **Impact**: 🔴 High  
 **Description**: Attacker calls back into contract during execution
 
 **Attack Vector**:
+
 ```solidity
 // Potential attack pattern (NOT present in TokenBot)
 function maliciousFunction() external {
@@ -37,17 +41,20 @@ function maliciousFunction() external {
 ```
 
 **Mitigations**:
+
 - ✅ Using OpenZeppelin's battle-tested contracts
 - ✅ No external calls in critical functions
 - ✅ Reentrancy guards where applicable
 - ✅ Checks-Effects-Interactions pattern followed
 
 #### T1.2: Integer Overflow/Underflow
+
 **Likelihood**: 🟢 Low  
 **Impact**: 🟡 Medium  
 **Description**: Arithmetic operations exceed variable limits
 
 **Attack Vector**:
+
 ```solidity
 // NOT possible in Solidity 0.8+ (automatic overflow protection)
 uint256 balance = type(uint256).max;
@@ -55,21 +62,25 @@ balance += 1; // Would overflow in older versions
 ```
 
 **Mitigations**:
+
 - ✅ Using Solidity 0.8.20 with built-in overflow protection
 - ✅ SafeMath not needed (automatic in 0.8+)
 - ✅ All arithmetic operations checked by compiler
 
 #### T1.3: Access Control Bypass
+
 **Likelihood**: 🟡 Medium  
 **Impact**: 🔴 High  
 **Description**: Unauthorized access to restricted functions
 
 **Attack Vectors**:
+
 - Direct calls to owner-only functions
 - Transaction front-running
 - Private key compromise
 
 **Mitigations**:
+
 - ✅ OpenZeppelin Ownable implementation
 - ✅ Hardware wallet for owner keys
 - ✅ Multi-signature wallet recommended
@@ -78,28 +89,33 @@ balance += 1; // Would overflow in older versions
 ### 2. Bridge-Related Threats
 
 #### T2.1: Bridge Exploit
+
 **Likelihood**: 🟡 Medium  
 **Impact**: 🔴 High  
 **Description**: Vulnerability in Base native bridge
 
 **Attack Vectors**:
+
 - Bridge contract vulnerabilities
 - Message passing manipulation
 - Finality attacks
 - Validator compromise
 
 **Mitigations**:
+
 - ✅ Using official Base bridge (audited)
 - ✅ No custom bridge logic
 - ✅ 7-day withdrawal delays
 - ✅ Community monitoring
 
 #### T2.2: Cross-Chain Replay Attacks
+
 **Likelihood**: 🟢 Low  
 **Impact**: 🟡 Medium  
 **Description**: Transaction replayed on different chain
 
 **Attack Vector**:
+
 ```javascript
 // Attacker replays signature on different chain
 const signature = await signer.signMessage(message);
@@ -107,6 +123,7 @@ const signature = await signer.signMessage(message);
 ```
 
 **Mitigations**:
+
 - ✅ Chain ID verification in signatures
 - ✅ Domain separation in EIP-712
 - ✅ Nonce-based replay protection
@@ -115,34 +132,40 @@ const signature = await signer.signMessage(message);
 ### 3. Economic Attacks
 
 #### T3.1: Market Manipulation
+
 **Likelihood**: 🟡 Medium  
 **Impact**: 🟡 Medium  
 **Description**: Price manipulation through large trades
 
 **Attack Vectors**:
+
 - Pump and dump schemes
 - Wash trading
 - Liquidity manipulation
 - Flash loan attacks on DeFi integrations
 
 **Mitigations**:
+
 - 🔄 Monitoring large transactions
 - 🔄 Community education
 - 🔄 Gradual liquidity provision
 - 🔄 Anti-manipulation measures in integrations
 
 #### T3.2: Governance Attacks (Future)
+
 **Likelihood**: 🟢 Low  
 **Impact**: 🟡 Medium  
 **Description**: Manipulation of governance mechanisms
 
 **Attack Vectors**:
+
 - Vote buying
-- Proposal manipulation  
+- Proposal manipulation
 - Quorum attacks
 - Flash loan governance attacks
 
 **Mitigations**:
+
 - 🔄 Current contracts have no governance
 - 🔄 Future governance design will include protections
 - 🔄 Timelock mechanisms planned
@@ -151,11 +174,13 @@ const signature = await signer.signMessage(message);
 ### 4. Infrastructure Threats
 
 #### T4.1: Private Key Compromise
+
 **Likelihood**: 🟡 Medium  
 **Impact**: 🔴 High  
 **Description**: Owner private key stolen or compromised
 
 **Attack Vectors**:
+
 - Phishing attacks
 - Malware on developer machines
 - Social engineering
@@ -163,6 +188,7 @@ const signature = await signer.signMessage(message);
 - Insider threats
 
 **Mitigations**:
+
 - ✅ Hardware wallet usage mandated
 - ✅ Key isolation practices
 - ✅ Multi-device verification
@@ -170,11 +196,13 @@ const signature = await signer.signMessage(message);
 - 🔄 Regular security training
 
 #### T4.2: Frontend Attacks
+
 **Likelihood**: 🟡 Medium  
 **Impact**: 🟡 Medium  
 **Description**: Malicious frontend modifications
 
 **Attack Vectors**:
+
 - DNS hijacking
 - CDN compromise
 - Malicious browser extensions
@@ -182,6 +210,7 @@ const signature = await signer.signMessage(message);
 - Supply chain attacks
 
 **Mitigations**:
+
 - 🔄 Subresource Integrity (SRI) hashes
 - 🔄 Content Security Policy (CSP)
 - 🔄 HTTPS enforcement
@@ -191,11 +220,13 @@ const signature = await signer.signMessage(message);
 ### 5. Social Engineering & Phishing
 
 #### T5.1: Impersonation Attacks
+
 **Likelihood**: 🔴 High  
 **Impact**: 🟡 Medium  
 **Description**: Attackers impersonate official accounts
 
 **Attack Vectors**:
+
 - Fake social media accounts
 - Phishing websites
 - Email impersonation
@@ -203,6 +234,7 @@ const signature = await signer.signMessage(message);
 - Fake support requests
 
 **Mitigations**:
+
 - ✅ Official communication channels documented
 - ✅ Verification procedures established
 - 🔄 Community education campaigns
@@ -210,17 +242,20 @@ const signature = await signer.signMessage(message);
 - 🔄 Verified badge acquisition
 
 #### T5.2: Support Scams
+
 **Likelihood**: 🔴 High  
 **Impact**: 🟡 Medium  
 **Description**: Fake support requesting private keys
 
 **Attack Vectors**:
+
 - Fake customer support
 - "Wallet verification" scams
 - "Airdrop" private key requests
 - Technical support impersonation
 
 **Mitigations**:
+
 - ✅ Clear "never ask for keys" policy
 - ✅ Official support channels documented
 - 🔄 Community moderation
@@ -229,22 +264,23 @@ const signature = await signer.signMessage(message);
 
 ## 🛡️ Risk Matrix
 
-| Threat | Likelihood | Impact | Risk Level | Status |
-|--------|------------|---------|------------|---------|
-| Smart Contract Reentrancy | Low | High | 🟡 Medium | ✅ Mitigated |
-| Integer Overflow | Low | Medium | 🟢 Low | ✅ Mitigated |
-| Access Control Bypass | Medium | High | 🔴 High | ✅ Mitigated |
-| Bridge Exploit | Medium | High | 🔴 High | 🔄 Monitoring |
-| Cross-Chain Replay | Low | Medium | 🟢 Low | ✅ Mitigated |
-| Market Manipulation | Medium | Medium | 🟡 Medium | 🔄 Planned |
-| Private Key Compromise | Medium | High | 🔴 High | 🔄 Enhanced |
-| Frontend Attacks | Medium | Medium | 🟡 Medium | 🔄 Planned |
-| Impersonation Attacks | High | Medium | 🔴 High | 🔄 Ongoing |
-| Support Scams | High | Medium | 🔴 High | 🔄 Ongoing |
+| Threat                    | Likelihood | Impact | Risk Level | Status        |
+| ------------------------- | ---------- | ------ | ---------- | ------------- |
+| Smart Contract Reentrancy | Low        | High   | 🟡 Medium  | ✅ Mitigated  |
+| Integer Overflow          | Low        | Medium | 🟢 Low     | ✅ Mitigated  |
+| Access Control Bypass     | Medium     | High   | 🔴 High    | ✅ Mitigated  |
+| Bridge Exploit            | Medium     | High   | 🔴 High    | 🔄 Monitoring |
+| Cross-Chain Replay        | Low        | Medium | 🟢 Low     | ✅ Mitigated  |
+| Market Manipulation       | Medium     | Medium | 🟡 Medium  | 🔄 Planned    |
+| Private Key Compromise    | Medium     | High   | 🔴 High    | 🔄 Enhanced   |
+| Frontend Attacks          | Medium     | Medium | 🟡 Medium  | 🔄 Planned    |
+| Impersonation Attacks     | High       | Medium | 🔴 High    | 🔄 Ongoing    |
+| Support Scams             | High       | Medium | 🔴 High    | 🔄 Ongoing    |
 
 ## 🎯 Mitigation Strategies
 
 ### Immediate Actions (0-30 days)
+
 1. **Enhanced Key Security**: Implement multi-signature wallet
 2. **Monitoring Setup**: Deploy transaction monitoring
 3. **Community Education**: Launch security awareness campaign
@@ -252,6 +288,7 @@ const signature = await signer.signMessage(message);
 5. **External Audit**: Engage professional auditors
 
 ### Short-term Actions (1-6 months)
+
 1. **Bug Bounty Program**: Launch community security program
 2. **Frontend Security**: Implement CSP and SRI
 3. **Incident Response**: Establish 24/7 response procedures
@@ -259,6 +296,7 @@ const signature = await signer.signMessage(message);
 5. **Governance Planning**: Design secure governance mechanisms
 
 ### Long-term Actions (6+ months)
+
 1. **Formal Verification**: Mathematical proof of critical functions
 2. **Decentralized Governance**: Transition to community governance
 3. **Layer 2 Expansion**: Evaluate additional L2 integrations
@@ -268,6 +306,7 @@ const signature = await signer.signMessage(message);
 ## 📈 Threat Intelligence
 
 ### Monitoring Sources
+
 - **DeFiPulse**: Smart contract exploits database
 - **Rekt News**: Latest DeFi hacks and vulnerabilities
 - **OpenZeppelin**: Security advisories and best practices
@@ -275,6 +314,7 @@ const signature = await signer.signMessage(message);
 - **Certik**: Real-time security monitoring
 
 ### Early Warning Indicators
+
 - Unusual transaction patterns
 - Large token movements
 - Bridge anomalies
@@ -282,6 +322,7 @@ const signature = await signer.signMessage(message);
 - Security tool alerts
 
 ### Response Protocols
+
 1. **Alert Triage**: Classify and prioritize threats
 2. **Investigation**: Detailed threat analysis
 3. **Communication**: Notify stakeholders
@@ -291,12 +332,14 @@ const signature = await signer.signMessage(message);
 ## 🔄 Continuous Improvement
 
 ### Regular Reviews
+
 - **Monthly**: Threat landscape assessment
-- **Quarterly**: Risk matrix updates  
+- **Quarterly**: Risk matrix updates
 - **Annually**: Complete threat model revision
 - **Ad-hoc**: Post-incident reviews
 
 ### Community Involvement
+
 - **Security Discussions**: Open forums for security topics
 - **Bug Reports**: Easy reporting mechanisms
 - **Education**: Regular security tips and updates
@@ -307,12 +350,14 @@ const signature = await signer.signMessage(message);
 ## 📞 Threat Reporting
 
 ### Internal Reporting
+
 - **Critical**: Immediate escalation to security team
 - **High**: Within 4 hours to security team
 - **Medium**: Within 24 hours to security team
 - **Low**: Weekly security review meeting
 
 ### External Reporting
+
 - **Email**: security@tokenbot.com
 - **Encrypted**: PGP key available on request
 - **Anonymous**: Security tip line available

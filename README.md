@@ -87,9 +87,6 @@ npm test
 # Test L1 contract only
 npm run test:l1
 
-# Test L2 contract only
-npm run test:l2
-
 # Generate coverage report
 npm run test:coverage
 
@@ -122,13 +119,14 @@ npm run format
 
 ```bash
 # Testnet (Sepolia + Base Sepolia + Solana Devnet)
-npm run deploy:multichain:testnet
+npm run deploy:testnet
 
 # Mainnet (Ethereum + Base + Solana)
-npm run deploy:multichain:mainnet
+npm run deploy:mainnet
 ```
 
 This will:
+
 1. Deploy TokenBotL1 to Ethereum
 2. Calculate Base L2 address (created on first bridge)
 3. Create SPL token on Solana
@@ -162,10 +160,11 @@ See [BRIDGE_GUIDE.md](./BRIDGE_GUIDE.md) for detailed integration examples.
 - **Ownable**: Administrative controls for owner
 - **Standard Compliant**: Full ERC-20 compatibility
 
-### L2 Enhancements (TokenBotL2)
+### Base L2 Token
 
-- **Permit (EIP-2612)**: Gasless approvals via signatures
-- **Optimized**: Lower gas costs on Base L2
+- **Automatic Creation**: Token is automatically created on Base when bridged from Ethereum
+- **Native Bridge**: Uses Base's native bridge for secure transfers
+- **No Manual Deployment**: Bridge handles L2 token creation
 
 ### Bridge Compatibility
 
@@ -185,14 +184,15 @@ See [BRIDGE_GUIDE.md](./BRIDGE_GUIDE.md) for detailed integration examples.
 
 ```
 ├── contracts/
-│   ├── TokenBotL1.sol     # Ethereum L1 contract
-│   └── TokenBotL2.sol     # Base L2 contract
+│   └── TokenBotL1.sol     # Ethereum L1 contract
 ├── scripts/
-│   ├── deployL1.js        # L1 deployment script
-│   └── deploy.js          # L2 deployment script
+│   ├── deploy.js           # Multi-chain deployment orchestration
+│   └── setup-env.js        # Interactive environment setup
 ├── test/
-│   ├── TokenBotL1.test.js # L1 tests (26 tests)
-│   └── TokenBotL2.test.js # L2 tests (21 tests)
+│   ├── TokenBotL1.test.js         # L1 tests
+│   ├── DeploymentScripts.test.js  # Deployment tests
+│   ├── MultiChainDeployment.test.js # Multi-chain tests
+│   └── SolanaBridge.test.js       # Solana bridge tests
 ├── BRIDGE_GUIDE.md        # Cross-chain bridging guide
 └── DEPLOYMENT.md          # Deployment instructions
 ```
@@ -226,7 +226,7 @@ See [BRIDGE_GUIDE.md](./BRIDGE_GUIDE.md) for detailed integration examples.
 
 - **Security Score**: 🟢 High (95/100)
 - **OpenZeppelin**: All contracts use audited implementations
-- **Test Coverage**: 47 tests with 100% line coverage
+- **Test Coverage**: Comprehensive test suite
 - **Static Analysis**: Slither and Mythril verified
 - **No Secrets**: No hardcoded keys or private information
 - **Audit Ready**: External audit recommended before mainnet
@@ -241,6 +241,7 @@ See [BRIDGE_GUIDE.md](./BRIDGE_GUIDE.md) for detailed integration examples.
 ### Reporting Vulnerabilities
 
 Found a security issue? Please report responsibly:
+
 - **Email**: security@tokenbot.com
 - **Response**: < 24 hours
 - **Bounty**: Up to $10,000 (planned)

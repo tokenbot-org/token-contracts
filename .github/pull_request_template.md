@@ -37,8 +37,9 @@ Brief description of what this PR does.
 ## Deployment Notes
 
 If this requires deployment:
-- Network: 
-- Estimated gas cost: 
+
+- Network:
+- Estimated gas cost:
 - Contract verification needed: Yes/No
 
 ## Additional Context

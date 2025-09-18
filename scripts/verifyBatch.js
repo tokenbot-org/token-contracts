@@ -34,7 +34,6 @@ async function verifyContract(contractName, contractAddress, network) {
 
     console.log(`✅ ${contractName} verified successfully!`);
     return true;
-
   } catch (error) {
     if (error.message.includes("Already Verified")) {
       console.log(`✅ ${contractName} is already verified!`);
@@ -51,7 +50,7 @@ async function main() {
   console.log(`🚀 Starting batch verification on ${network}...`);
 
   const contractsForNetwork = CONTRACTS[network];
-  
+
   if (!contractsForNetwork) {
     console.error(`❌ No contracts configured for network: ${network}`);
     console.log("Available networks:", Object.keys(CONTRACTS).join(", "));
@@ -72,7 +71,7 @@ async function main() {
     totalCount++;
     const success = await verifyContract(contractName, contractAddress, network);
     results[contractName] = success;
-    
+
     if (success) {
       successCount++;
     }
@@ -89,7 +88,7 @@ async function main() {
   console.log("========================");
   console.log(`Network: ${network}`);
   console.log(`Successful: ${successCount}/${totalCount}`);
-  
+
   for (const [contractName, success] of Object.entries(results)) {
     const status = success ? "✅" : "❌";
     console.log(`${status} ${contractName}`);
@@ -100,10 +99,10 @@ async function main() {
   const explorerUrls = {
     mainnet: "https://etherscan.io",
     sepolia: "https://sepolia.etherscan.io",
-    baseMainnet: "https://basescan.org", 
+    baseMainnet: "https://basescan.org",
     baseTestnet: "https://sepolia.basescan.org"
   };
-  
+
   const explorerUrl = explorerUrls[network];
   if (explorerUrl) {
     for (const [contractName, contractAddress] of Object.entries(contractsForNetwork)) {
@@ -124,7 +123,7 @@ async function main() {
 // Handle errors gracefully
 main()
   .then(() => process.exit(0))
-  .catch((error) => {
+  .catch(error => {
     console.error("❌ Batch verification failed:", error);
     process.exit(1);
   });

@@ -7,13 +7,13 @@ describe("Multi-Chain Deployment", function () {
   let tokenL1;
   let owner;
   let l1Address;
-  
+
   const BASE_L2_BRIDGE = "0x4200000000000000000000000000000000000010";
   const WORMHOLE_BRIDGE = "0x3ee18B2214AFF97000D974cf647E7C347E8fa585";
 
   beforeEach(async function () {
     [owner] = await ethers.getSigners();
-    
+
     // Deploy L1 token
     const TokenBotL1 = await ethers.getContractFactory("TokenBotL1");
     tokenL1 = await TokenBotL1.deploy();
@@ -44,38 +44,26 @@ describe("Multi-Chain Deployment", function () {
   describe("Base L2 Address Calculation", function () {
     it("Should calculate deterministic L2 address", function () {
       // Simplified CREATE2 calculation for testing
-      const salt = ethers.solidityPackedKeccak256(
-        ["address", "address"],
-        [l1Address, BASE_L2_BRIDGE]
-      );
-      
+      const salt = ethers.solidityPackedKeccak256(["address", "address"], [l1Address, BASE_L2_BRIDGE]);
+
       // Verify salt is deterministic
-      const salt2 = ethers.solidityPackedKeccak256(
-        ["address", "address"],
-        [l1Address, BASE_L2_BRIDGE]
-      );
-      
+      const salt2 = ethers.solidityPackedKeccak256(["address", "address"], [l1Address, BASE_L2_BRIDGE]);
+
       expect(salt).to.equal(salt2);
       expect(salt).to.match(/^0x[a-fA-F0-9]{64}$/);
     });
 
     it("Should generate unique addresses for different L1 tokens", async function () {
       // Deploy second token
-      const TokenBotL1_2 = await ethers.getContractFactory("TokenBotL1");
-      const token2 = await TokenBotL1_2.deploy();
+      const TokenBotL1Factory = await ethers.getContractFactory("TokenBotL1");
+      const token2 = await TokenBotL1Factory.deploy();
       await token2.waitForDeployment();
       const l1Address2 = await token2.getAddress();
 
       // Calculate salts
-      const salt1 = ethers.solidityPackedKeccak256(
-        ["address", "address"],
-        [l1Address, BASE_L2_BRIDGE]
-      );
-      
-      const salt2 = ethers.solidityPackedKeccak256(
-        ["address", "address"],
-        [l1Address2, BASE_L2_BRIDGE]
-      );
+      const salt1 = ethers.solidityPackedKeccak256(["address", "address"], [l1Address, BASE_L2_BRIDGE]);
+
+      const salt2 = ethers.solidityPackedKeccak256(["address", "address"], [l1Address2, BASE_L2_BRIDGE]);
 
       expect(salt1).to.not.equal(salt2);
     });
@@ -116,7 +104,7 @@ describe("Multi-Chain Deployment", function () {
     it("Should support Base bridge requirements", async function () {
       // Base bridge requires standard ERC20 functions
       const amount = ethers.parseEther("100");
-      
+
       // Test approval
       await expect(tokenL1.approve(BASE_L2_BRIDGE, amount))
         .to.emit(tokenL1, "Approval")
@@ -134,38 +122,33 @@ describe("Multi-Chain Deployment", function () {
     it("Should support Wormhole bridge requirements", async function () {
       // Wormhole requires approval and transferFrom
       const amount = ethers.parseEther("50");
-      
+
       // Create a mock bridge signer
       const [, , bridgeSigner] = await ethers.getSigners();
-      
+
       // Owner approves bridge signer to spend tokens
       await tokenL1.connect(owner).approve(bridgeSigner.address, amount);
-      
+
       // Simulate bridge calling transferFrom
-      await expect(tokenL1.connect(bridgeSigner).transferFrom(owner.address, WORMHOLE_BRIDGE, amount))
-        .to.changeTokenBalances(
-          tokenL1,
-          [owner, WORMHOLE_BRIDGE],
-          [-amount, amount]
-        );
+      await expect(
+        tokenL1.connect(bridgeSigner).transferFrom(owner.address, WORMHOLE_BRIDGE, amount)
+      ).to.changeTokenBalances(tokenL1, [owner, WORMHOLE_BRIDGE], [-amount, amount]);
     });
 
     it("Should handle pause functionality during bridging", async function () {
       const amount = ethers.parseEther("100");
-      
+
       // Pause the token
       await tokenL1.pause();
-      
+
       // Bridging should fail when paused
-      await expect(tokenL1.transfer(BASE_L2_BRIDGE, amount))
-        .to.be.revertedWithCustomError(tokenL1, "EnforcedPause");
-      
+      await expect(tokenL1.transfer(BASE_L2_BRIDGE, amount)).to.be.revertedWithCustomError(tokenL1, "EnforcedPause");
+
       // Unpause
       await tokenL1.unpause();
-      
+
       // Bridging should work again
-      await expect(tokenL1.transfer(BASE_L2_BRIDGE, amount))
-        .to.not.be.reverted;
+      await expect(tokenL1.transfer(BASE_L2_BRIDGE, amount)).to.not.be.reverted;
     });
   });
 

@@ -1,146 +1,77 @@
-# TokenBot L1-L2 Bridge Guide
+# TokenBot Bridge Guide
 
-This guide explains how to deploy and use TokenBot (TBOT) across Ethereum L1 and Base L2 using the native Base Bridge.
+## Supported Bridges
 
-## Overview
+### Base Bridge (Ethereum ↔ Base)
+- **UI**: https://bridge.base.org
+- **Time**: 1-3 min deposit, 7 days withdrawal
+- **L2 Token**: Auto-created on first bridge
 
-The native Base Bridge approach allows seamless token transfers between Ethereum mainnet (L1) and Base (L2):
+### Wormhole (Ethereum ↔ Solana)
+- **UI**: https://portalbridge.com
+- **Time**: ~15 minutes both ways
+- **SPL Token**: Auto-created by Wormhole on first bridge
 
-- Deploy TBOT on Ethereum L1 first
-- Base Bridge automatically creates the L2 representation
-- Users can bridge tokens in both directions
+## How to Bridge
 
-## Architecture
-
-```
-Ethereum L1                    Base L2
-┌─────────────┐               ┌─────────────┐
-│ TokenBotL1  │               │ L2 TBOT     │
-│   (TBOT)    │◄─────────────►│ (Auto-      │
-│             │  Base Bridge   │  created)   │
-└─────────────┘               └─────────────┘
-```
-
-## Deployment Steps
-
-### 1. Deploy to Ethereum L1
-
-#### Testnet (Sepolia)
-
-```bash
-npm run deploy:l1:testnet
-```
-
-#### Mainnet
-
-```bash
-npm run deploy:l1:mainnet
-```
-
-### 2. Bridge Setup
-
-After L1 deployment, the Base Bridge automatically:
-
-- Detects your L1 token
-- Creates the corresponding L2 token on Base
-- Sets up the bridge contracts
-
-No additional deployment needed on L2!
-
-## How to Bridge Tokens
-
-### Using Base Bridge UI
+### Ethereum → Base
 
 1. Visit https://bridge.base.org
-2. Connect your wallet
-3. Select "Deposit" (L1 → L2) or "Withdraw" (L2 → L1)
-4. Add TBOT token:
-   - Enter the L1 TBOT contract address
-   - The bridge will auto-detect token details
-5. Enter amount to bridge
-6. Approve and confirm transaction
+2. Connect wallet
+3. Select "Deposit"
+4. Add TBOT token address
+5. Enter amount and confirm
 
-### Bridge Timing
+### Base → Ethereum
 
-- **L1 → L2 (Deposit)**: ~1-3 minutes
-- **L2 → L1 (Withdraw)**: ~7 days (challenge period)
+1. Visit https://bridge.base.org
+2. Select "Withdraw"
+3. Enter amount
+4. Wait 7 days for security period
 
-### Programmatic Bridging
+### Ethereum → Solana
 
-#### Deposit (L1 → L2)
+1. Visit https://portalbridge.com
+2. Register Ethereum token (one-time)
+3. Select Ethereum as source, Solana as destination
+4. Enter amount and confirm
+5. Wormhole creates wrapped SPL token automatically
+6. Wait ~15 minutes
+
+## Bridge Contracts
+
+### Base Mainnet
+- L1 Bridge: `0x3154Cf16ccdb4C6d922629664174b904d80F2C35`
+- L2 Bridge: `0x4200000000000000000000000000000000000010`
+
+### Base Testnet (Sepolia)
+- L1 Bridge: `0xfA6D8Ee5BE770F84FC001D098C4bD604Fe01284a`
+- L2 Bridge: `0x4200000000000000000000000000000000000010`
+
+## Programmatic Bridging
 
 ```javascript
-// Example code for depositing TBOT from L1 to L2
-const L1StandardBridge = "0x3154Cf16ccdb4C6d922629664174b904d80F2C35"; // Base L1 Bridge
-const l1Token = "YOUR_L1_TBOT_ADDRESS";
-const l2Token = "AUTO_CREATED_L2_ADDRESS"; // Get from Base Bridge
-const amount = ethers.parseEther("100"); // 100 TBOT
+// Deposit L1 → L2
+const bridge = "0x3154Cf16ccdb4C6d922629664174b904d80F2C35";
+const amount = ethers.parseEther("100");
 
-// 1. Approve bridge to spend tokens
-await tbot.approve(L1StandardBridge, amount);
+// Approve
+await tbot.approve(bridge, amount);
 
-// 2. Bridge tokens
+// Bridge
 await bridge.depositERC20(
   l1Token,
   l2Token,
   amount,
   200000, // L2 gas limit
-  "0x" // Extra data
+  "0x"
 );
 ```
 
-## Finding Your L2 Token Address
+## Notes
 
-After first bridge transaction:
-
-1. Check transaction on Base Bridge UI
-2. Or query the L2 bridge:
-   ```javascript
-   const L2StandardBridge = "0x4200000000000000000000000000000000000010";
-   // Call l2TokenAddress = bridge.l1ToL2Token(l1TokenAddress)
-   ```
-
-## Important Addresses
-
-### Base Bridge Contracts
-
-#### Mainnet
-
-- L1 Standard Bridge: `0x3154Cf16ccdb4C6d922629664174b904d80F2C35`
-- L2 Standard Bridge: `0x4200000000000000000000000000000000000010`
-
-#### Testnet (Sepolia → Base Sepolia)
-
-- L1 Standard Bridge: `0xfA6D8Ee5BE770F84FC001D098C4bD604Fe01284a`
-- L2 Standard Bridge: `0x4200000000000000000000000000000000000010`
-
-## Security Considerations
-
-1. **First Deployment**: Always test on testnet first
-2. **Bridge Limits**: Some bridges have deposit limits
-3. **Gas Costs**: Ensure sufficient ETH on both chains
-4. **Withdrawal Time**: L2→L1 takes 7 days for security
-
-## Troubleshooting
-
-### "Token not found" on Bridge UI
-
-- Ensure L1 token is deployed and verified
-- Try refreshing or manually adding token address
-
-### High gas fees
-
-- Bridge during low network congestion
-- Adjust gas settings in wallet
-
-### Transaction stuck
-
-- Check Etherscan/Basescan for status
-- May need to wait for network confirmation
-
-## Resources
-
-- Base Bridge: https://bridge.base.org
-- Base Docs: https://docs.base.org/guides/bridge-tokens
-- Bridge Status: https://status.base.org
-- Support: https://help.coinbase.com/en/base
+- Both Base and Solana tokens are created automatically on first bridge
+- No manual token deployment needed on L2 chains
+- Withdrawals from Base take 7 days (security period)
+- Solana wrapped token uses 9 decimals vs Ethereum's 18
+- Always test with small amounts first

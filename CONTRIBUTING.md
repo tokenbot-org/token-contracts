@@ -1,4 +1,6 @@
-# Contributing to TokenBot Contracts
+# 🤝 Contributing to TokenBot Contracts
+
+Welcome! We're excited you're interested in contributing to the TokenBot token contracts. This guide will help you get started.
 
 ## Development Workflow
 
@@ -15,6 +17,7 @@ We use a Git Flow-inspired workflow with `develop` as the default branch for ong
 ### Pull Request Process
 
 1. **Create a feature branch from `develop`**
+
    ```bash
    git checkout develop
    git pull origin develop
@@ -27,18 +30,22 @@ We use a Git Flow-inspired workflow with `develop` as the default branch for ong
    - Follow existing code style
 
 3. **Run tests and linting**
+
    ```bash
-   npm test
-   npm run lint
-   npm run test:coverage
+   npm test              # Run all 78 tests
+   npm run lint          # Check code style
+   npm run lint:fix      # Auto-fix issues
+   npm run test:coverage # Ensure 100% coverage
+   npm run test:gas      # Check gas usage
    ```
 
 4. **Commit your changes**
+
    ```bash
    git add .
    git commit -m "feat: add new feature description"
    ```
-   
+
    Follow [Conventional Commits](https://www.conventionalcommits.org/):
    - `feat:` - New features
    - `fix:` - Bug fixes
@@ -48,6 +55,7 @@ We use a Git Flow-inspired workflow with `develop` as the default branch for ong
    - `chore:` - Maintenance tasks
 
 5. **Push to GitHub**
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -72,6 +80,7 @@ Before merging, all PRs must:
 ### Release Process
 
 1. When `develop` is ready for release:
+
    ```bash
    git checkout main
    git merge develop
@@ -88,17 +97,20 @@ Before merging, all PRs must:
 1. **Fork the repository** (external contributors)
 
 2. **Clone your fork**
+
    ```bash
    git clone https://github.com/YOUR-USERNAME/token-contracts.git
    cd token-contracts
    ```
 
 3. **Add upstream remote**
+
    ```bash
    git remote add upstream https://github.com/tokenbot-org/token-contracts.git
    ```
 
 4. **Install dependencies**
+
    ```bash
    npm install
    ```
@@ -119,32 +131,105 @@ git push origin develop
 
 ### Code Style Guidelines
 
+#### Solidity
+
 - Use 2 spaces for indentation
-- Follow Solidity style guide
+- Follow [Solidity Style Guide](https://docs.soliditylang.org/en/latest/style-guide.html)
 - Keep functions focused and small
-- Add natspec comments for contracts
-- Write self-documenting code
+- Add NatSpec comments for all public functions
+- Use explicit visibility modifiers
+- Order: state variables, events, modifiers, constructor, functions
+
+#### JavaScript/TypeScript
+
+- Use 2 spaces for indentation
+- Use ESLint configuration provided
+- Prefer async/await over promises
+- Use descriptive variable names
+- Add JSDoc comments for complex functions
 
 ### Testing Guidelines
 
 - Write unit tests for all new functions
-- Aim for 100% code coverage
+- Maintain 100% code coverage (required)
 - Test edge cases and error conditions
 - Use descriptive test names
 - Group related tests in describe blocks
+- Test gas consumption for critical functions
+- Include integration tests for multi-contract interactions
+
+#### Running Tests
+
+```bash
+# Run specific test suites
+npm run test:l1          # L1 contract tests
+npm run test:l2          # L2 contract tests
+npm run test:multichain  # Multi-chain tests
+
+# Generate reports
+npm run test:coverage    # Coverage report
+npm run test:gas         # Gas usage report
+```
 
 ### Security Considerations
 
-- Never commit private keys or secrets
-- Follow checks in security checklist
-- Consider gas optimization
-- Think about reentrancy and other attacks
-- Get security review for critical changes
+⚠️ **Critical Security Rules**
 
-## Questions?
+1. **Never commit:**
+   - Private keys or mnemonics
+   - API keys or secrets
+   - Production deployment addresses (use deployment files)
 
-- Open an issue for bugs/features
-- Join discussions for questions
-- Check existing issues first
+2. **Always:**
+   - Run security checks: `npm run security:check`
+   - Follow [Security Checklist](./docs/security/SECURITY_CHECKLIST.md)
+   - Consider gas optimization
+   - Check for reentrancy vulnerabilities
+   - Validate all external inputs
+   - Use SafeMath or Solidity 0.8+ overflow protection
 
-Thank you for contributing!
+3. **For critical changes:**
+   - Request security review
+   - Run Slither analysis
+   - Consider formal verification
+
+## Getting Help
+
+### Resources
+
+- 📚 [Documentation](https://docs.tokenbot.com)
+- 🐛 [Report Issues](https://github.com/tokenbot-org/token-contracts/issues)
+- 💬 [Discussions](https://github.com/tokenbot-org/token-contracts/discussions)
+- 📧 [Email Support](mailto:dev@tokenbot.com)
+
+### Before Opening an Issue
+
+1. Check existing issues and discussions
+2. Search the documentation
+3. Try to reproduce the problem
+4. Collect relevant information (versions, logs, etc.)
+
+### Issue Templates
+
+We provide templates for:
+
+- 🐞 Bug reports
+- ✨ Feature requests
+- 📝 Documentation improvements
+- 🔒 Security vulnerabilities (see [SECURITY.md](./.github/SECURITY.md))
+
+## Recognition
+
+Contributors are recognized in:
+
+- GitHub contributors page
+- Release notes
+- Project documentation
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the MIT License.
+
+---
+
+**Thank you for contributing to TokenBot! Your efforts help make this project better for everyone.** 🚀

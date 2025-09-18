@@ -63,6 +63,7 @@ We follow coordinated disclosure principles:
 ### Out of Scope
 
 The following are generally out of scope:
+
 - Issues in third-party dependencies (report to respective projects)
 - Social engineering attacks
 - Physical attacks on infrastructure
@@ -72,5 +73,6 @@ The following are generally out of scope:
 ### Contact
 
 For questions about this security policy:
+
 - **General**: security@tokenbot.com
 - **Community**: [GitHub Discussions](https://github.com/tokenbot-org/tokenbot-contracts/discussions)
