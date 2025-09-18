@@ -1,7 +1,7 @@
 {
   "name": "tokenbot",
   "version": "1.0.0",
-  "description": "TokenBot (TBOT) - Multi-chain ERC-20 token on Ethereum, Base, and Solana",
+  "description": "TokenBot (TBOT) - ERC-20 token with multi-chain bridge support",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -31,8 +31,6 @@
     "deploy:ethereum:mainnet": "hardhat run scripts/deployEthereum.js --network ethereum",
     "deploy:base:testnet": "hardhat run scripts/deployEthereum.js --network baseTestnet",
     "deploy:base:mainnet": "hardhat run scripts/deployEthereum.js --network baseMainnet",
-    "deploy:solana:devnet": "node scripts/deploySolana.js",
-    "deploy:solana:mainnet": "SOLANA_RPC_URL=https://api.mainnet-beta.solana.com node scripts/deploySolana.js",
     "verify": "hardhat run scripts/verify.js",
     "verify:batch": "hardhat run scripts/verifyBatch.js",
     "verify:l1:testnet": "hardhat run scripts/verify.js --network sepolia",

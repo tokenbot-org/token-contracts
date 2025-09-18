@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a multi-chain TokenBot (TBOT) token contract repository supporting Ethereum L1, Base L2, and Solana deployments. The project implements ERC-20 tokens with bridging capabilities between Ethereum mainnet and Base L2 using native bridges, plus SPL token support for Solana via Wormhole.
+This is a multi-chain TokenBot (TBOT) token contract repository supporting Ethereum L1, Base L2, and Solana. The project implements an ERC-20 token on Ethereum with automatic bridging capabilities - Base L2 token is auto-created via Base Bridge, and Solana SPL token is auto-created via Wormhole Bridge.
 
 ## Development Commands
 
@@ -46,8 +46,8 @@ npx hardhat size-contracts     # Check contract sizes
 ### Deployment
 
 ```bash
-npm run deploy:testnet   # Deploy to Sepolia + Base Sepolia + Solana Devnet
-npm run deploy:mainnet   # Deploy to Ethereum + Base + Solana mainnet
+npm run deploy:testnet   # Deploy to Sepolia testnet
+npm run deploy:mainnet   # Deploy to Ethereum mainnet
 ```
 
 ### Contract Verification
@@ -69,9 +69,9 @@ npm run verify:batch:mainnet       # Batch verify on mainnet
 
 ### Multi-Chain Flow
 
-1. **Ethereum L1**: Primary token deployment with TokenBotL1
-2. **Base L2**: Automatic creation via Base native bridge (no manual deployment needed)
-3. **Solana**: SPL token created via scripts/deploy.js with Wormhole integration
+1. **Ethereum L1**: Deploy TokenBotL1 (only manual deployment needed)
+2. **Base L2**: Auto-created when first bridged via Base Bridge
+3. **Solana**: Auto-created when first bridged via Wormhole
 
 ### Key Features
 
@@ -95,8 +95,6 @@ Environment variables needed:
 - `BASE_MAINNET_RPC`: Base RPC endpoint
 - `ETHERSCAN_API_KEY`: For contract verification
 - `BASESCAN_API_KEY`: For Base contract verification
-- `SOLANA_RPC_URL`: Solana RPC (optional)
-- `SOLANA_PRIVATE_KEY`: Solana wallet (optional)
 
 ## Testing Strategy
 

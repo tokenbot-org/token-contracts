@@ -24,7 +24,8 @@
       "Bash(npm run test:*)",
       "Bash(npm ls:*)",
       "Bash(node:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(gh pr create:*)"
     ],
     "deny": []
   }
