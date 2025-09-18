@@ -5,12 +5,11 @@ const path = require("path");
 const { generateTestConfig } = require("./helpers/multichain");
 
 describe("Deployment Scripts", function () {
-  let owner;
   const deploymentsDir = path.join(__dirname, "../deployments");
 
   before(async function () {
-    [owner] = await ethers.getSigners();
-    
+    await ethers.getSigners();
+
     // Ensure deployments directory exists
     if (!fs.existsSync(deploymentsDir)) {
       fs.mkdirSync(deploymentsDir, { recursive: true });
@@ -19,18 +18,9 @@ describe("Deployment Scripts", function () {
 
   describe("Environment Configuration", function () {
     it("Should validate required environment variables", function () {
-      const requiredVars = [
-        "PRIVATE_KEY",
-        "ETHEREUM_RPC_URL",
-        "BASE_RPC_URL"
-      ];
+      const requiredVars = ["PRIVATE_KEY", "ETHEREUM_RPC_URL", "BASE_RPC_URL"];
 
-      const optionalVars = [
-        "SOLANA_RPC_URL",
-        "SOLANA_PRIVATE_KEY",
-        "ETHERSCAN_API_KEY",
-        "BASESCAN_API_KEY"
-      ];
+      const optionalVars = ["SOLANA_RPC_URL", "SOLANA_PRIVATE_KEY", "ETHERSCAN_API_KEY", "BASESCAN_API_KEY"];
 
       // In test environment, we don't need actual values
       // Just verify the structure
@@ -68,25 +58,25 @@ describe("Deployment Scripts", function () {
 
       const filename = `test-${Date.now()}-deployment.json`;
       const filepath = path.join(deploymentsDir, filename);
-      
+
       // Write test file
       fs.writeFileSync(filepath, JSON.stringify(testDeployment, null, 2));
-      
+
       // Verify it was created
       expect(fs.existsSync(filepath)).to.be.true;
-      
+
       // Read and verify contents
       const saved = JSON.parse(fs.readFileSync(filepath, "utf8"));
       expect(saved.network).to.equal("sepolia");
       expect(saved.contracts.TokenBotL1.address).to.match(/^0x[0-9a-fA-F]{40}$/);
-      
+
       // Clean up
       fs.unlinkSync(filepath);
     });
 
     it("Should handle deployment history", function () {
       const deployments = [];
-      
+
       // Create multiple test deployments
       for (let i = 0; i < 3; i++) {
         deployments.push({
@@ -99,12 +89,12 @@ describe("Deployment Scripts", function () {
       // Save history
       const historyFile = path.join(deploymentsDir, "test-history.json");
       fs.writeFileSync(historyFile, JSON.stringify(deployments, null, 2));
-      
+
       // Read history
       const history = JSON.parse(fs.readFileSync(historyFile, "utf8"));
       expect(history).to.have.lengthOf(3);
       expect(history[0].version).to.equal(1);
-      
+
       // Clean up
       fs.unlinkSync(historyFile);
     });
@@ -113,7 +103,7 @@ describe("Deployment Scripts", function () {
   describe("Network Configuration", function () {
     it("Should handle mainnet configuration", function () {
       const config = generateTestConfig();
-      
+
       expect(config.networks.ethereum.chainId).to.equal(1);
       expect(config.networks.base.chainId).to.equal(8453);
       expect(config.networks.solana.cluster).to.equal("mainnet-beta");
@@ -146,10 +136,10 @@ describe("Deployment Scripts", function () {
     it("Should estimate deployment gas correctly", async function () {
       const TokenBotL1 = await ethers.getContractFactory("TokenBotL1");
       const deployTx = await TokenBotL1.getDeployTransaction();
-      
+
       // Estimate gas
       const estimatedGas = await ethers.provider.estimateGas(deployTx);
-      
+
       // Deployment should be under 3M gas
       expect(estimatedGas).to.be.lt(3000000n);
       expect(estimatedGas).to.be.gt(0n);
@@ -160,10 +150,10 @@ describe("Deployment Scripts", function () {
     it("Should handle deployment failures gracefully", async function () {
       // Test with insufficient gas
       const TokenBotL1 = await ethers.getContractFactory("TokenBotL1");
-      
+
       try {
         // This would fail in a real environment with gasLimit: 1
-        const token = await TokenBotL1.deploy({ gasLimit: 1 });
+        await TokenBotL1.deploy({ gasLimit: 1 });
         expect.fail("Should have thrown an error");
       } catch (error) {
         // In test environment, might not fail the same way
@@ -182,9 +172,7 @@ describe("Deployment Scripts", function () {
       ];
 
       invalidAddresses.forEach(addr => {
-        const isValid = !!(addr && 
-                         typeof addr === "string" && 
-                         /^0x[0-9a-fA-F]{40}$/.test(addr));
+        const isValid = !!(addr && typeof addr === "string" && /^0x[0-9a-fA-F]{40}$/.test(addr));
         expect(isValid).to.equal(false);
       });
 

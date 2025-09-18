@@ -1,7 +1,7 @@
 {
   "name": "tokenbot",
   "version": "1.0.0",
-  "description": "TokenBot (TBOT) - Multi-chain ERC-20 token on Ethereum, Base, and Solana",
+  "description": "TokenBot (TBOT) - ERC-20 token with multi-chain bridge support",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -15,7 +15,6 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "test:l1": "hardhat test test/TokenBotL1.test.js",
-    "test:l2": "hardhat test test/TokenBotL2.test.js",
     "test:coverage": "hardhat coverage",
     "test:gas": "REPORT_GAS=true hardhat test",
     "lint": "npm run lint:sol && npm run lint:js",
@@ -26,14 +25,16 @@
     "lint:js:fix": "eslint '**/*.js' --fix",
     "format": "prettier --write '**/*.{js,json,md,sol}'",
     "format:check": "prettier --check '**/*.{js,json,md,sol}'",
-    "deploy:multichain:testnet": "hardhat run scripts/deployMultiChain.js --network sepolia",
-    "deploy:multichain:mainnet": "hardhat run scripts/deployMultiChain.js --network mainnet",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network sepolia",
+    "deploy:mainnet": "hardhat run scripts/deploy.js --network mainnet",
+    "deploy:ethereum:testnet": "hardhat run scripts/deployEthereum.js --network sepolia",
+    "deploy:ethereum:mainnet": "hardhat run scripts/deployEthereum.js --network ethereum",
+    "deploy:base:testnet": "hardhat run scripts/deployEthereum.js --network baseTestnet",
+    "deploy:base:mainnet": "hardhat run scripts/deployEthereum.js --network baseMainnet",
     "verify": "hardhat run scripts/verify.js",
     "verify:batch": "hardhat run scripts/verifyBatch.js",
     "verify:l1:testnet": "hardhat run scripts/verify.js --network sepolia",
     "verify:l1:mainnet": "hardhat run scripts/verify.js --network mainnet",
-    "verify:l2:testnet": "hardhat run scripts/verify.js --network baseTestnet",
-    "verify:l2:mainnet": "hardhat run scripts/verify.js --network baseMainnet",
     "verify:batch:testnet": "hardhat run scripts/verifyBatch.js --network sepolia",
     "verify:batch:mainnet": "hardhat run scripts/verifyBatch.js --network mainnet",
     "verify:batch:base:testnet": "hardhat run scripts/verifyBatch.js --network baseTestnet",
@@ -88,8 +89,11 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.0",
+    "@solana/spl-token": "^0.3.9",
     "@solana/web3.js": "^1.87.6",
-    "@solana/spl-token": "^0.3.9"
+    "bip39": "^3.1.0",
+    "bs58": "^6.0.0",
+    "ed25519-hd-key": "^1.3.0"
   },
   "engines": {
     "node": ">=16.0.0"
