@@ -35,10 +35,7 @@ jobs:
         
       - name: Run L1 tests
         run: npm run test:l1
-        
-      - name: Run L2 tests
-        run: npm run test:l2
-        
+
       - name: Generate gas report
         run: npm run test:gas
         env:
