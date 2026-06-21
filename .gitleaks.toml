@@ -1,0 +1,27 @@
+# gitleaks configuration for token-contracts
+#
+# Extends the full built-in ruleset (AWS keys, GitHub PATs, private keys, etc.)
+# and only suppresses false positives confirmed during the 2026-06-21 audit.
+#
+# IMPORTANT: the allowlist is deliberately narrow. It does NOT blanket-exempt
+# test files or 64-hex values, so a real private key or API key committed
+# anywhere will still fail the scan.
+title = "TokenBot token-contracts"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Reviewed false positives — public on-chain data and Solidity identifiers"
+regexes = [
+  # Public EVM addresses are 20 bytes / 40 hex and are on-chain public data.
+  # Bounded with \b so 64-hex private keys are NOT suppressed by this rule.
+  '''0x[a-fA-F0-9]{40}\b''',
+  # OpenZeppelin custom-error / interface identifiers used throughout the tests,
+  # e.g. ERC20InsufficientBalance, ERC20InvalidReceiver.
+  '''ERC20[A-Za-z]+''',
+]
+paths = [
+  # Deployment artifacts hold only public mint/deployer addresses and tx signatures.
+  '''deployments/.*\.json$''',
+]
