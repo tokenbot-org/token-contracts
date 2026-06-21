@@ -9,11 +9,8 @@
 a35d09f7e102cfb51af82e0259cd625269980b2c:.env.example:generic-api-key:40
 a35d09f7e102cfb51af82e0259cd625269980b2c:.env.example:generic-api-key:43
 
-# Documentation placeholders (NOT secrets) — reviewed 2026-06-21.
-# These are illustrative values in docs that no longer exist at HEAD:
-#   DEPLOYER_PRIVATE_KEY=abc123def456...   (literal placeholder)
-#   TokenBotL1: "0x742d35cc6464c9532...8df31fa93"  (truncated example address)
-#   TokenBotL2: "0x123abc...def456"        (truncated example address)
+# Illustrative placeholders (NOT secrets) in docs that no longer exist at HEAD —
+# docs/ENVIRONMENT_SETUP.md and docs/VERIFICATION.md. Reviewed 2026-06-21.
 696d54b844eb1b1ae25c99e6611de3d6cfc24db7:docs/ENVIRONMENT_SETUP.md:generic-api-key:138
 a70cd9186e1b5d3ca57331ed29f99a336eb4ed59:docs/VERIFICATION.md:generic-api-key:136
 a70cd9186e1b5d3ca57331ed29f99a336eb4ed59:docs/VERIFICATION.md:generic-api-key:139
