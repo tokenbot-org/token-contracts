@@ -24,4 +24,8 @@ regexes = [
 paths = [
   # Deployment artifacts hold only public mint/deployer addresses and tx signatures.
   '''deployments/.*\.json$''',
+  # gitleaks' own metadata files legitimately contain fingerprints and example
+  # patterns that resemble findings — never scan them for secrets.
+  '''(^|/)\.gitleaksignore$''',
+  '''(^|/)\.gitleaks\.toml$''',
 ]
