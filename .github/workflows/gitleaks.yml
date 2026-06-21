@@ -1,0 +1,45 @@
+# Secret scanning with gitleaks
+#
+# Scans the FULL git history (fetch-depth: 0) on every PR/push to main, on a
+# weekly schedule, and on demand. Fails the run if a real secret is found.
+#
+# We install the gitleaks binary directly instead of using gitleaks-action,
+# because gitleaks-action requires a paid GITLEAKS_LICENSE for repos owned by
+# an organization. The binary itself is free and unrestricted.
+#
+# Confirmed false positives (public on-chain addresses, Solidity error
+# identifiers, deployment artifacts) are suppressed via .gitleaks.toml.
+name: gitleaks
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 9 * * 1' # weekly full-history scan, Mondays 09:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: Scan for secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install gitleaks
+        run: |
+          VERSION=8.30.1
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${VERSION}/gitleaks_${VERSION}_linux_x64.tar.gz" -o gitleaks.tar.gz
+          tar -xzf gitleaks.tar.gz gitleaks
+          sudo install gitleaks /usr/local/bin/gitleaks
+          gitleaks version
+
+      - name: Scan full git history
+        run: gitleaks git . --config .gitleaks.toml --redact --verbose --exit-code 1
